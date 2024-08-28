@@ -7,6 +7,8 @@
 
 body {
     /* background-color: #602c03; */
+    /* background-color: #FF3CAC;
+    background-image: linear-gradient(225deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%); */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,7 +20,7 @@ body {
     max-width: 400px;
     padding: 20px;
     background-color: #fff;
-    box-shadow: 0px 0px 20px 12px rgb(12 1 1 / 36%);
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
     border-radius: 10px;
     text-align: center;
     position: relative;
