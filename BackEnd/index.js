@@ -83,6 +83,7 @@ app.post('/login-packet', async (req, res) => {
     
         console.log('Login successful, redirecting...');
         res.status(200).json({ redirectURL: '/userInterface.html' });
+        // res.status(200).json({ redirectURL: '/exam.html' });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'Error checking username and password' });

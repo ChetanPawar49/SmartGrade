@@ -1,0 +1,184 @@
+/* Default styles */
+body {
+    /* font-family: Arial, sans-serif; */
+    font-family: "Poppins", sans-serif;
+    /* background-color: #c1c5cb; */
+    background: linear-gradient(to right, #4348cc, #5746a1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.quiz-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    /* box-shadow: 0 8px 11px rgb(55 42 53 / 41%); */
+    box-shadow: 0 8px 11px rgba(118, 56, 193, 0.41);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.progress-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.progress-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    margin: 0 15px;
+    background-color: #f8f9fa;
+}
+
+.progress-circle.filled {
+    /* background-color: #007bff; */
+    background-color: #4348cc;
+    /* border-color: #007bff; */
+    border-color: #4348cc;
+}
+
+.question-container {
+    margin-bottom: 20px;
+}
+
+.question {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.options {
+    margin-bottom: 20px;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.option.selected {
+    background-color: #cce5ff;
+    /* background-color: #caced2; */
+    border-color: #5746a1;
+    /* border-color: #004085; */
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.btn-container button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    /* background-color: #007bff; */
+    background-color: #4348cc;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-prev {
+    background-color: #6c757d;
+}
+
+.btn-submit {
+    background-color: #28a745;
+}
+
+.btn-next {
+    background-color: #007bff;
+}
+
+.btn-container button:disabled {
+    background-color: #a0abb7;
+    cursor: not-allowed;
+}
+
+.result-container {
+    display: none;
+    text-align: center;
+}
+
+.result-container h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+}
+
+.result-container p {
+    font-size: 1.2rem;
+}
+
+.result-container button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #007bff;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.result-container button:hover {
+    background-color: #0056b3;
+}
+
+/* Forced Colors Mode styles */
+@media (forced-colors: active) {
+    body {
+        background-color: Window; /* Adjust background color for forced colors */
+    }
+
+    .quiz-container {
+        background-color: WindowText; /* Adjust container color for forced colors */
+        color: WindowText; /* Adjust text color for forced colors */
+        border-color: Highlight; /* Adjust border color for forced colors */
+    }
+
+    .option {
+        border-color: Highlight; /* Adjust border color for forced colors */
+    }
+
+    .btn-container button {
+        background-color: Highlight; /* Adjust button background for forced colors */
+    }
+
+    .btn-container button:disabled {
+        background-color: GrayText; /* Adjust disabled button background for forced colors */
+    }
+
+    .result-container {
+        color: WindowText; /* Adjust result text color for forced colors */
+    }
+
+    .result-container button {
+        background-color: Highlight; /* Adjust result button background for forced colors */
+    }
+
+    .result-container button:hover {
+        background-color: Highlight; /* Adjust result button hover color for forced colors */
+    }
+}

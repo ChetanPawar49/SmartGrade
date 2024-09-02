@@ -23,8 +23,8 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);*/
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-  /*  border: 1px solid rgba(255, 255, 255, 0.18);*/
-   color: rgb(35, 20, 2);
+    /* border: 1px solid rgba(255, 255, 255, 0.18); */
+    color: rgb(35, 20, 2);
     max-width: 400px;
     width: 100%;
 }
