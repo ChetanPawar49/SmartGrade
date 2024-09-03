@@ -8,6 +8,9 @@ const PORT = 3000;
 // Serve static files from the 'Frontend/CSS' directory
 app.use('/css', express.static(path.join(__dirname, '../FrontEnd/CSS')));
 
+// Serve static files from the 'Frontend/CSS' directory
+app.use('/fav', express.static(path.join(__dirname, '../FrontEnd/favicon_io')));
+
 //For Images
 app.use('/img', express.static(path.join(__dirname, '../FrontEnd/IMAGES')));
 
