@@ -9,10 +9,15 @@ body {
     /* background-color: #602c03; */
     /* background-color: #FF3CAC;
     background-image: linear-gradient(225deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%); */
-    display: flex;
+    /* display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100vh; */
+}
+
+div .home {
+    width: 10%;
+    margin: 10px;
 }
 
 .login-container {
@@ -25,6 +30,7 @@ body {
     text-align: center;
     position: relative;
     transition: transform 0.3s ease, border-color 0.3s ease;
+    margin: 190px auto;
 }
 
 .login-container:hover {

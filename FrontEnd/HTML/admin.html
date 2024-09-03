@@ -6,7 +6,8 @@
     <title>Admin Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- <style>
         body {
             display: flex;
             height: 100vh;
@@ -39,7 +40,7 @@
         .section.active {
             display: block;
         }
-    </style>
+    </style> -->
 </head>
 <body>
     <!-- Sidebar -->
@@ -56,7 +57,7 @@
         <!-- <a href="#transactions" data-target="transactions-section">Transactions</a> -->
         <a href="#settings">Settings</a>
         <a href="#reports">Reports</a>
-        <a href="#logout">Logout</a>
+        <a href="#logout" data-target="logout-section">Logout</a>
     </div>
 
     <!-- Main Content -->
@@ -216,6 +217,12 @@
                     <!-- </tbody>
                 </table>
             </div> -->
+
+            <!-- Logout Section -->
+            <div id="logout-section" class="section">
+                <h2>Logout</h2>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
         </div>
     </div>
 
@@ -278,6 +285,14 @@
             fetchData('/question', 'questions-table');
             fetchData('/attempt', 'attempts-table');
         });
+
+        // Logout function
+        function logout() {
+            // Perform logout action here
+            // For example: window.location.href = '/logout';
+            window.top.location.href = '/';
+            alert('Logged out successfully!');
+        }
     </script>
 </body>
 
