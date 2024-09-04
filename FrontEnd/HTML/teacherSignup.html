@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/signup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/js/userSignup.js" defer></script>
+    <title>Sign Up Page</title>
+</head>
+
+<body>
+    <div>
+        <button id="home" class="home">Home</button>
+    </div>
+    <div class="signup-container">
+        <form id="registrationForm" class="signup-form">
+            <h2><i class="fas fa-user-plus"></i> Sign Up</h2>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="fname" name="fname" placeholder="First Name" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="lname" name="lname" placeholder="Last Name" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="pass" name="pass" placeholder="Password" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user-tag"></i>
+                <select id="usertype" name="usertype" required>
+                    <!-- <option value="" disabled selected>User Type</option> -->
+                    <!-- <option value="student">Student</option> -->
+                    <option value="teacher">Teacher</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-phone"></i>
+                <input type="tel" id="mobileno" name="mobileno" placeholder="Mobile" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="mail" name="mail" placeholder="Email" required>
+            </div>
+            <button type="submit">Sign Up</button>
+            <p class="login-link">Already have an account? <a href="/login.html">Login</a></p>
+        </form>
+
+        <script>
+            document.getElementById('home').addEventListener('click', function() {
+                window.top.location.href = '/'; //Redirects to home page when home button is clicked
+            });
+        </script>
+    </div>
+</body>
+
+</html>
