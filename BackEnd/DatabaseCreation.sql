@@ -1,154 +1,101 @@
-DROP DATABASE IF EXISTS Smartgrade;
-CREATE DATABASE IF NOT EXISTS Smartgrade;
-USE Smartgrade;
+DROP DATABASE IF EXISTS smartgrade;
 
--- Table for registering table numbers and names
-CREATE TABLE IF NOT EXISTS Table_Registry (
-    tableID INT NOT NULL AUTO_INCREMENT,
-    table_name VARCHAR(50) NOT NULL,
-    table_number INT NOT NULL UNIQUE,
-    PRIMARY KEY (tableID)
+CREATE DATABASE IF NOT EXISTS smartgrade;
+
+USE smartgrade;
+
+CREATE TABLE `admin` (
+  `username` varchar(20) NOT NULL,
+  `password` varchar(20) NOT NULL
 );
 
--- SuperUser table
-CREATE TABLE IF NOT EXISTS SuperUser(
-    username VARCHAR(20) NOT NULL,
-    password VARCHAR(20) NOT NULL
+CREATE TABLE `User_Master` (
+  `userID` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(20) NOT NULL,
+  `firstname` varchar(10) NOT NULL,
+  `lastname` varchar(10),
+  `usertype` enum('Student', 'Teacher') NOT NULL,
+  `mobile` varchar(15) NOT NULL,
+  `email` varchar(25) NOT NULL,
+  `status` enum('Pending', 'Active', 'Inactive') DEFAULT 'Pending',
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('SuperUser', 1);
 
--- User_Master table
-CREATE TABLE IF NOT EXISTS User_Master(
-    userID INT NOT NULL UNIQUE AUTO_INCREMENT,
-    username VARCHAR(20) NOT NULL,
-    password VARCHAR(20) NOT NULL,
-    firstname VARCHAR(10) NOT NULL,
-    lastname VARCHAR(10),
-    usertype ENUM('Applicant','Organization','Organizer') NOT NULL,
-    mobile VARCHAR(15) NOT NULL,
-    email VARCHAR(25) NOT NULL,
-    status ENUM('Pending','Active','Inactive') DEFAULT 'Pending',
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (userID)
+CREATE TABLE `Teacher` (
+  `teacherId` int UNIQUE PRIMARY KEY NOT NULL,
+  `userID` int NOT NULL,
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('User_Master', 2);
 
--- Organization table
-CREATE TABLE IF NOT EXISTS Organization(
-    organizationID INT NOT NULL UNIQUE,
-    name VARCHAR(10) NOT NULL,
-    location VARCHAR(15) NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (organizationID) REFERENCES User_Master (userID)
+CREATE TABLE `Student` (
+  `applicationID` int UNIQUE PRIMARY KEY NOT NULL,
+  `userID` int NOT NULL,
+  `examID` int UNIQUE NOT NULL,
+  `appstatus` enum('Pending', 'Active', 'Inactive') NOT NULL,
+  `attendance` enum('Pending', 'Present', 'Absent') NOT NULL,
+  `marks` int NOT NULL,
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Organization', 3);
 
--- Application_Master table
-CREATE TABLE IF NOT EXISTS Application_Master(
-    applicationID INT NOT NULL,
-    examID INT NOT NULL,
-    adhaarcard VARCHAR(14) NOT NULL,
-    feesstatus ENUM('Paid','Pending') NOT NULL,
-    tokenid VARCHAR(30) NOT NULL,
-    appstatus ENUM('Pending','Active','Inactive') NOT NULL,
-    attendance ENUM('Pending','Present','Absent') NOT NULL,
-    marks INT NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (applicationID) REFERENCES User_Master (userID),
-    PRIMARY KEY (examID, applicationID)
+CREATE TABLE `Exam_Master` (
+  `examID` int UNIQUE PRIMARY KEY NOT NULL,
+  `name` varchar(15) NOT NULL,
+  `app_start_date` date NOT NULL,
+  `app_end_date` date NOT NULL,
+  `exam_start_time` time NOT NULL,
+  `exam_end_date` date NOT NULL,
+  `exam_end_time` time NOT NULL,
+  `total_marks` int NOT NULL,
+  `passing_marks` int NOT NULL,
+  `status` enum('Pending', 'Completed') NOT NULL,
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Application_Master', 4);
 
--- Organizer_Organization table
-CREATE TABLE IF NOT EXISTS Organizer_Organization(
-    organizerID INT NOT NULL UNIQUE,
-    organizationID INT NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (organizerID) REFERENCES User_Master (userID),
-    FOREIGN KEY (organizationID) REFERENCES Organization(organizationID),
-    PRIMARY KEY (organizerID, organizationID)
+CREATE TABLE `Question_Master` (
+  `questionID` int UNIQUE PRIMARY KEY NOT NULL,
+  `examID` int NOT NULL,
+  `questiontype` varchar(20) NOT NULL,
+  `question` varchar(70) NOT NULL,
+  `optionA` varchar(40) NOT NULL,
+  `optionB` varchar(40) NOT NULL,
+  `optionC` varchar(40) NOT NULL,
+  `optionD` varchar(40) NOT NULL,
+  `answer_key` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
+  `question_marks` int NOT NULL,
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Organizer_Organization', 5);
 
--- Exam_Master table
-CREATE TABLE IF NOT EXISTS Exam_Master(
-    examID INT NOT NULL UNIQUE,
-    organizerID INT NOT NULL,
-    name VARCHAR(15) NOT NULL,
-    app_start_date DATE NOT NULL,
-    app_end_date DATE NOT NULL,
-    exam_start_time TIME NOT NULL,
-    exam_end_date DATE NOT NULL,
-    exam_end_time TIME NOT NULL,
-    total_marks INT NOT NULL,
-    passing_marks INT NOT NULL,
-    status ENUM('Pending','Completed') NOT NULL,
-    fees INT NOT NULL,
-    syllabus VARCHAR(100) NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (examID, organizerID),
-    FOREIGN KEY (organizerID) REFERENCES Organizer_Organization (organizerID)
+CREATE TABLE `Attempt_Master` (
+  `attemptID` int UNIQUE PRIMARY KEY NOT NULL,
+  `examID` int NOT NULL,
+  `questionID` int NOT NULL,
+  `applicationID` int NOT NULL,
+  `selected_option` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
+  `correct_option` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
+  `marks_obt` int NOT NULL,
+  `timestamp` timestamp NOT NULL
 );
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Exam_Master', 6);
 
--- Question_Master table
-CREATE TABLE IF NOT EXISTS Question_Master(
-    questionID INT NOT NULL UNIQUE,
-    examID INT NOT NULL,
-    questiontype VARCHAR(20) NOT NULL,
-    question VARCHAR(70) NOT NULL,
-    optionA VARCHAR(40) NOT NULL,
-    optionB VARCHAR(40) NOT NULL,
-    optionC VARCHAR(40) NOT NULL,
-    optionD VARCHAR(40) NOT NULL,
-    answer_key ENUM('optionA','optionB','optionC','optionD') NOT NULL,
-    question_marks INT NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (questionID, examID),
-    FOREIGN KEY (examID) REFERENCES Exam_Master (examID)
-);
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Question_Master', 7);
+ALTER TABLE `Teacher` ADD FOREIGN KEY (`userID`) REFERENCES `User_Master` (`userID`);
 
--- Attempt_Master table
-CREATE TABLE IF NOT EXISTS Attempt_Master(
-    attemptID INT UNIQUE NOT NULL,
-    examID INT NOT NULL,
-    questionID INT NOT NULL UNIQUE,
-    applicationID INT NOT NULL,
-    selected_option ENUM('optionA','optionB','optionC','optionD') NOT NULL,
-    correct_option ENUM('optionA','optionB','optionC','optionD') NOT NULL,
-    marks_obt INT NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (examID, questionID, applicationID),
-    FOREIGN KEY (examID) REFERENCES Application_Master (examID),
-    FOREIGN KEY (questionID) REFERENCES Question_Master (questionID),
-    FOREIGN KEY (applicationID) REFERENCES Application_Master (applicationID)
-);
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Attempt_Master', 8);
+ALTER TABLE `Student` ADD FOREIGN KEY (`userID`) REFERENCES `User_Master` (`userID`);
 
--- Transaction_Master table
-CREATE TABLE IF NOT EXISTS Transaction_Master(
-    trans_id INT NOT NULL UNIQUE,
-    exam_id INT NOT NULL UNIQUE,
-    paidfees INT NOT NULL,
-    upi_token VARCHAR(40) NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (trans_id),
-    FOREIGN KEY (exam_id) REFERENCES Exam_Master (examID)
-);
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Transaction_Master', 9);
+ALTER TABLE `Student` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
 
--- Log table to track changes
-CREATE TABLE IF NOT EXISTS Change_Log (
-    logID INT NOT NULL AUTO_INCREMENT,
-    table_number INT NOT NULL,
-    changed_by VARCHAR(20) NOT NULL,
-    change_type ENUM('INSERT','UPDATE','DELETE') NOT NULL,
-    change_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (logID),
-    FOREIGN KEY (table_number) REFERENCES Table_Registry (table_number)
-);
-INSERT INTO Table_Registry (table_name, table_number) VALUES ('Change_Log', 10);
+ALTER TABLE `Question_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
 
--- Display all tables
+ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Student` (`examID`);
+
+ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question_Master` (`questionID`);
+
+ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
+
+SELECT * FROM user_master;
+
 SHOW TABLES;
+
+INSERT INTO admin VALUES("admin", "admin123");
+
+INSERT INTO user_master VALUES(1, 'Chetan', 'chetan', 'chetan', 'pawar', 'Student', 8793164197, 'chetan.pawar492@gmail.com', 'Pending', CURRENT_TIMESTAMP);
+INSERT INTO user_master(username, password, firstname, lastname, usertype, mobile, email, timestamp) VALUES('shubham', 'ss', 'shubham', 'pawar', 'Student', 8237776199, 'shubham@gmail.com', current_timestamp());
