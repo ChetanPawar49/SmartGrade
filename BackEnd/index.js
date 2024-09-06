@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2/promise');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const app = express();
 const PORT = 3000;
 
@@ -38,7 +39,7 @@ app.use(session({
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'root',
+    password: 'admin',
     database: 'smartgrade',
     waitForConnections: true,
     connectionLimit: 10,
@@ -272,31 +273,81 @@ app.get('/student', async (req, res) => {
     }
 });
 
+// Function to send an email (modular)
+async function sendEmail(userEmail, status) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail', // Or your email provider
+        secure : true,
+        port : 465,
+        auth: {
+            user: 'lastspacehero@gmail.com',
+            pass: 'pvnu knbm fakv bzfz'
+        }
+    });
+
+    let subject, text;
+
+    if (status === 'Active') {
+        subject = 'Account Activated';
+        text = `Dear User, your account has been activated.`;
+    } else if (status === 'Inactive') {
+        subject = 'Account Deactivated';
+        text = `Dear User, your account has been deactivated.`;
+    }
+
+    const mailOptions = {
+        from: 'lastspacehero@gmail.com',
+        to: userEmail,
+        subject: subject,
+        text: text
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${userEmail}`);
+}
+
+// API route to handle status update and send email
 app.post('/status', async (req, res) => {
     const { id, status } = req.body;
-    console.log("id : ",id ,"status :",status)
+    console.log("id : ", id, "status :", status);
     let connection;
     try {
         connection = await pool.getConnection();
-        // Execute the update query
+        
+        // Update status query
         const [result] = await connection.query('UPDATE user_master SET status = ? WHERE userId = ?', [status, id]);
-        const [newresult] = await connection.query('select usertype from user_master where userId=?',[id]);
-    
-        // Check if any row was affected
+
+        // Check if update was successful
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'User not found or no change in status' });
         }
-        // Send success response
-        res.status(200).json({ message: 'Registration successful!', receivedData: req.body });
+
+        // Fetch user email
+        const [userResult] = await connection.query('SELECT email FROM user_master WHERE userId = ?', [id]);
+
+        if (userResult.length > 0) {
+            const userEmail = userResult[0].email;
+
+            // Send email
+            await sendEmail(userEmail, status);
+
+            // Send success response
+            res.status(200).json({ message: 'Status updated and email sent successfully!' });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
     } catch (err) {
-        console.error('Error updating data:', err);
-        res.status(500).json({ error: 'Failed to update user status' });
+        console.error('Error updating status or sending email:', err);
+        res.status(500).json({ error: 'Failed to update status or send email' });
     } finally {
         if (connection) {
-            connection.release(); // Ensure connection is released
+            connection.release();
         }
     }
 });
+
+
 
 app.get('/teacher', async (req, res) => {
     try {
