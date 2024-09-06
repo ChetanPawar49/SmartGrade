@@ -313,31 +313,6 @@
                 });
             }
 
-        //     Function to update status and send an email (Client-Side)
-function updateStatusAndSendEmail(userId, status) {
-    fetch('/status', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: userId, status: status })
-    })
-    .then(response => {
-        // Check if the response is OK
-        if (!response.ok) {
-            throw new Error('Failed to update status or send email');
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(`Status updated and email sent successfully! User is now ${status}.`);
-    })
-    .catch(error => {
-        console.error('Error updating status or sending email:', error);
-        alert('Error updating status or sending email.');
-    });
-}
-
             // Initial Fetch and populate data for each table
             fetchData('/student', 'applicant-table');
             fetchData('/teacher', 'organizer-table');
