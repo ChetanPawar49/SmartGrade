@@ -17,7 +17,7 @@ CREATE TABLE `User_Master` (
   `lastname` varchar(10),
   `usertype` enum('Student', 'Teacher') NOT NULL,
   `mobile` varchar(15) NOT NULL,
-  `email` varchar(25) NOT NULL,
+  `email` varchar(50) NOT NULL,
   `status` enum('Pending', 'Active', 'Inactive') DEFAULT 'Pending',
   `timestamp` timestamp NOT NULL
 );
