@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 alert('Registration successful! You will Receive an email once your account is activated with 24 hours ');
                 // Redirect or clear the form as needed
-                window.location.href = '/login.html';
+                window.top.location.href = '/';
             } else {
                 alert('Registration failed: ' + data.message);
             }
