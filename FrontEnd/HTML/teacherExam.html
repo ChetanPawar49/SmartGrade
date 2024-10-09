@@ -3,146 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/teacherExam.css">
-    <title>Teacher's Exam Creation</title>
+    <title>Create Exam</title>
+    <link rel="stylesheet" href="/CSS/teacherExam.css">
 </head>
 <body>
-    <div class="container">
-        <div class="section">
-            <h2>Create Exam Questions</h2>
-            <label for="num-questions">How many questions do you want to create?</label>
-            <input type="number" id="num-questions" min="1" placeholder="Enter number of questions">
-            <label for="exam-time">Set Exam Duration (HH:MM)</label>
-            <input type="time" id="exam-time" placeholder="Set exam time">
-            <button onclick="generateQuestionInputs()">Generate Questions</button>
-        </div>
-        <div id="questions-form" class="questions-form-container"></div>
-        <div id="created-questions" class="created-questions"></div>
-        <div id="submit-container" class="buttons hidden">
-            <button onclick="submitQuestions()">Submit All Questions</button>
-        </div>
-        <div id="alert-message" class="alert hidden"></div>
-        <div id="success-message" class="success hidden"></div>
 
-        <div id="exam-preview" class="exam-preview hidden">
-            <h2>Exam Preview</h2>
-            <div id="exam-questions"></div>
-            <div id="exam-time-display"></div>
-        </div>
-    </div>
-    <script>
-        let questionCount = 0;
-        const questionsArray = [];
+    <h2>Create Exam</h2>
 
-        function generateQuestionInputs() {
-            const numQuestions = parseInt(document.getElementById('num-questions').value);
-            const examTime = document.getElementById('exam-time').value;
-
-            if (isNaN(numQuestions) || numQuestions <= 0) {
-                alert("Please enter a valid number of questions.");
-                return;
-            }
-
-            if (!examTime) {
-                alert("Please set a valid exam duration.");
-                return;
-            }
-
-            questionCount = numQuestions;
-            const formContainer = document.getElementById('questions-form');
-            formContainer.innerHTML = '';
-
-            for (let i = 0; i < numQuestions; i++) {
-                formContainer.innerHTML += `
-                    <div class="question-box">
-                        <h3>Question ${i + 1}</h3>
-                        <input type="text" id="question-${i}" placeholder="Enter question text">
-                        <div class="options-container" id="options-${i}">
-                            <div class="option">
-                                <input type="radio" name="answer-${i}" value="0">
-                                <input type="text" placeholder="Option 1">
-                            </div>
-                            <div class="option">
-                                <input type="radio" name="answer-${i}" value="1">
-                                <input type="text" placeholder="Option 2">
-                            </div>
-                            <div class="option">
-                                <input type="radio" name="answer-${i}" value="2">
-                                <input type="text" placeholder="Option 3">
-                            </div>
-                            <div class="option">
-                                <input type="radio" name="answer-${i}" value="3">
-                                <input type="text" placeholder="Option 4">
-                            </div>
-                        </div>
+    <table id="examTable">
+        <thead>
+            <tr>
+                <th>Exam Name</th>
+                <th>Exam Date</th>
+                <th>Exam Time</th>
+                <th>Exam Duration (Minutes)</th>
+                <th>Total Marks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input type="text" id="examName" placeholder="Enter exam name" required>
+                </td>
+                <td>
+                    <input type="date" id="examDate" required>
+                </td>
+                <td>
+                    <input type="time" id="examTime" required>
+                </td>
+                <td>
+                    <input type="number" id="examDuration" min="1" placeholder="Enter duration in minutes" required>
+                </td>
+                <td>
+                    <input type="number" id="totalMarks" placeholder="Enter total marks" required>
+                </td>
+                <td>
+                    <div class="button-container">
+                        <button class="create-questions-btn" id="createQuestionsBtn">Create Questions</button>
+                        <!-- <button class="set-exam-btn" id="setExamBtn">Set Exam</button> -->
                     </div>
-                `;
-            }
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-            document.getElementById('submit-container').classList.remove('hidden');
-            document.getElementById('alert-message').classList.add('hidden');
-            document.getElementById('success-message').classList.add('hidden');
-            document.getElementById('exam-preview').classList.add('hidden'); // Hide exam preview initially
+    <!-- Add Exam Button -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="add-exam-btn" id="addExamBtn">Add Exam</button>
+    </div>
+
+    <!-- <script src="/js/teacherExam2.js"></script> -->
+    <script>
+        // Function to add a new exam row
+        function addExamRow() {
+            const tableBody = document.getElementById('examTable').getElementsByTagName('tbody')[0];
+            const newRow = tableBody.insertRow();
+
+            // Create cells for the new row
+            const examNameCell = newRow.insertCell(0);
+            const examDateCell = newRow.insertCell(1);
+            const examTimeCell = newRow.insertCell(2);
+            const examDurationCell = newRow.insertCell(3);
+            const totalMarksCell = newRow.insertCell(4);
+            const actionCell = newRow.insertCell(5);
+
+            // Set HTML for the new row
+            examNameCell.innerHTML = `<input type="text" placeholder="Enter exam name" required>`;
+            examDateCell.innerHTML = `<input type="date" required>`;
+            examTimeCell.innerHTML = `<input type="time" required>`;
+            examDurationCell.innerHTML = `<input type="number" min="1" placeholder="Enter duration in minutes" required>`;
+            totalMarksCell.innerHTML = `<input type="number" placeholder="Enter total marks" required>`;
+            actionCell.innerHTML = `
+                <div class="button-container">
+                    <button class="create-questions-btn">Create Questions</button>
+                    <!-- <button class="set-exam-btn" onclick="setExam(this)">Set Exam</button> -->
+                    <!-- New Set Exam Button -->
+                </div>
+            `;
         }
 
-        function submitQuestions() {
-            questionsArray.length = 0;
-            const formElements = document.querySelectorAll('.question-box');
+        // Event listener for "Add Exam" button
+        document.getElementById('addExamBtn').addEventListener('click', addExamRow);
 
-            let isValid = true;
-            formElements.forEach((box, index) => {
-                const questionText = box.querySelector(`input[id="question-${index}"]`).value;
-                const options = Array.from(box.querySelectorAll('.options-container .option input[type="text"]')).map(input => input.value);
-                const correctAnswer = box.querySelector(`input[name="answer-${index}"]:checked`)?.value;
+        // Event listener for "Create Questions" button (for the first row)
+        document.getElementById('createQuestionsBtn').addEventListener('click', function() {
+            createQuestions(this);
+        });
 
-                if (questionText && options.length === 4 && correctAnswer !== undefined) {
-                    questionsArray.push({ question: questionText, options, answer: parseInt(correctAnswer) });
-                } else {
-                    isValid = false;
-                }
-            });
+        // Function to handle question creation
+        function createQuestions(button) {
+            const row = button.closest('tr');
+            const examName = row.querySelector('input[type="text"]').value;
+            const examDate = row.querySelector('input[type="date"]').value;
+            const examTime = row.querySelector('input[type="time"]').value;
+            const examDuration = row.querySelector('input[type="number"]').value;
+            const totalMarks = row.querySelector('input[type="number"]:last-of-type').value;
 
-            if (isValid) {
-                const createdQuestionsContainer = document.getElementById('created-questions');
-                createdQuestionsContainer.innerHTML = '';
-                const examPreviewContainer = document.getElementById('exam-questions');
-                examPreviewContainer.innerHTML = '';
-
-                questionsArray.forEach((question, index) => {
-                    createdQuestionsContainer.innerHTML += `
-                        <div class="question-item">
-                            <span>${index + 1}</span>
-                            <p>${question.question}</p>
-                        </div>
-                    `;
-                    examPreviewContainer.innerHTML += `
-                        <div class="question-item">
-                            <span>${index + 1}</span>
-                            <p>${question.question}</p>
-                            <div class="options-container">
-                                ${question.options.map((option, idx) => `
-                                    <div class="option">
-                                        <input type="radio" name="exam-answer-${index}" value="${idx}">
-                                        <span>${option}</span>
-                                    </div>`).join('')}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                const examTime = document.getElementById('exam-time').value;
-                document.getElementById('exam-time-display').innerHTML = `<strong>Time Allotted: ${examTime}</strong>`;
-                document.getElementById('exam-preview').classList.remove('hidden');
-
-                document.getElementById('alert-message').classList.add('hidden');
-                document.getElementById('success-message').textContent = 'Test created successfully!';
-                document.getElementById('success-message').classList.remove('hidden');
-            } else {
-                document.getElementById('alert-message').textContent = 'Please complete all questions with exactly four options before submitting.';
-                document.getElementById('alert-message').classList.remove('hidden');
-                document.getElementById('success-message').classList.add('hidden');
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examDuration || !totalMarks) {
+                alert("Please fill out all fields to set the exam.");
+                return;
             }
+
+            // Save exam details in session storage
+            sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks);
+
+            // Redirect to the question creation page (teacher_que.html)
+            window.location.href = "/teacherQue.html";
+        }
+
+        // Function to set the exam (validate input)
+        function setExam(button) {
+            const row = button.closest('tr');
+            const examName = row.querySelector('input[type="text"]').value;
+            const examDate = row.querySelector('input[type="date"]').value;
+            const examTime = row.querySelector('input[type="time"]').value;
+            const examDuration = row.querySelector('input[type="number"]').value;
+            const totalMarks = row.querySelectorAll('input[type="number"]')[1].value;
+
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examDuration || !totalMarks) {
+                alert("Please fill out all fields to set the exam.");
+                return;
+            }
+
+            // Save exam details in session storage
+            sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks);
+
+            // Message for user to confirm exam has been set
+            alert('Exam has been set successfully.');
         }
     </script>
+
 </body>
 </html>

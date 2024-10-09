@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/teacherExam.css">
+    <title>Teacher's Exam Creation</title>
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <h2>Create Exam Questions</h2>
+            <label for="exam-name">Enter Exam Name</label>
+            <input type="text" id="exam-name" placeholder="Enter exam name">
+            <label for="num-questions">How many questions do you want to create?</label>
+            <input type="number" id="num-questions" min="1" placeholder="Enter number of questions">
+            <label for="exam-duration">Set Exam Duration (in Minutes)</label>
+            <input type="number" id="exam-duration" min="1" placeholder="Enter exam duration in minutes">
+            <button onclick="generateQuestionInputs()">Generate Questions</button>
+        </div>
+        <div id="questions-form" class="questions-form-container"></div>
+        <div id="created-questions" class="created-questions"></div>
+        <div id="submit-container" class="buttons hidden">
+            <button onclick="submitQuestions()">Submit All Questions</button>
+        </div>
+        <div id="alert-message" class="alert hidden"></div>
+        <div id="success-message" class="success hidden"></div>
+
+        <div id="exam-preview" class="exam-preview hidden">
+            <h2>Exam Preview</h2>
+            <h3 id="preview-exam-name"></h3>
+            <div id="exam-questions"></div>
+            <div id="exam-time-display"></div>
+        </div>
+    </div>
+    
+    <script src="/js/teacherExam.js"></script>
+    <!-- <script src="/js/teacherExam2.js"></script> -->
+</body>
+</html>
