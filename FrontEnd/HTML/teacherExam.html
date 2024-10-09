@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Exam</title>
+    <link rel="stylesheet" href="/CSS/teacherExam.css">
+</head>
+<body>
+
+    <h2>Create Exam</h2>
+
+    <table id="examTable">
+        <thead>
+            <tr>
+                <th>Exam Name</th>
+                <th>Exam Date</th>
+                <th>Exam Time</th>
+                <th>Exam Duration (Minutes)</th>
+                <th>Total Marks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input type="text" id="examName" placeholder="Enter exam name" required>
+                </td>
+                <td>
+                    <input type="date" id="examDate" required>
+                </td>
+                <td>
+                    <input type="time" id="examTime" required>
+                </td>
+                <td>
+                    <input type="number" id="examDuration" min="1" placeholder="Enter duration in minutes" required>
+                </td>
+                <td>
+                    <input type="number" id="totalMarks" placeholder="Enter total marks" required>
+                </td>
+                <td>
+                    <div class="button-container">
+                        <button class="create-questions-btn" id="createQuestionsBtn">Create Questions</button>
+                        <!-- <button class="set-exam-btn" id="setExamBtn">Set Exam</button> -->
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Add Exam Button -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="add-exam-btn" id="addExamBtn">Add Exam</button>
+    </div>
+
+    <!-- <script src="/js/teacherExam2.js"></script> -->
+    <script>
+        // Function to add a new exam row
+        function addExamRow() {
+            const tableBody = document.getElementById('examTable').getElementsByTagName('tbody')[0];
+            const newRow = tableBody.insertRow();
+
+            // Create cells for the new row
+            const examNameCell = newRow.insertCell(0);
+            const examDateCell = newRow.insertCell(1);
+            const examTimeCell = newRow.insertCell(2);
+            const examDurationCell = newRow.insertCell(3);
+            const totalMarksCell = newRow.insertCell(4);
+            const actionCell = newRow.insertCell(5);
+
+            // Set HTML for the new row
+            examNameCell.innerHTML = `<input type="text" placeholder="Enter exam name" required>`;
+            examDateCell.innerHTML = `<input type="date" required>`;
+            examTimeCell.innerHTML = `<input type="time" required>`;
+            examDurationCell.innerHTML = `<input type="number" min="1" placeholder="Enter duration in minutes" required>`;
+            totalMarksCell.innerHTML = `<input type="number" placeholder="Enter total marks" required>`;
+            actionCell.innerHTML = `
+                <div class="button-container">
+                    <button class="create-questions-btn">Create Questions</button>
+                    <!-- <button class="set-exam-btn" onclick="setExam(this)">Set Exam</button> -->
+                    <!-- New Set Exam Button -->
+                </div>
+            `;
+        }
+
+        // Event listener for "Add Exam" button
+        document.getElementById('addExamBtn').addEventListener('click', addExamRow);
+
+        // Event listener for "Create Questions" button (for the first row)
+        document.getElementById('createQuestionsBtn').addEventListener('click', function() {
+            createQuestions(this);
+        });
+
+        // Function to handle question creation
+        function createQuestions(button) {
+            const row = button.closest('tr');
+            const examName = row.querySelector('input[type="text"]').value;
+            const examDate = row.querySelector('input[type="date"]').value;
+            const examTime = row.querySelector('input[type="time"]').value;
+            const examDuration = row.querySelector('input[type="number"]').value;
+            const totalMarks = row.querySelector('input[type="number"]:last-of-type').value;
+
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examDuration || !totalMarks) {
+                alert("Please fill out all fields to set the exam.");
+                return;
+            }
+
+            // Save exam details in session storage
+            sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks);
+
+            // Redirect to the question creation page (teacher_que.html)
+            window.location.href = "/teacherQue.html";
+        }
+
+        // Function to set the exam (validate input)
+        function setExam(button) {
+            const row = button.closest('tr');
+            const examName = row.querySelector('input[type="text"]').value;
+            const examDate = row.querySelector('input[type="date"]').value;
+            const examTime = row.querySelector('input[type="time"]').value;
+            const examDuration = row.querySelector('input[type="number"]').value;
+            const totalMarks = row.querySelectorAll('input[type="number"]')[1].value;
+
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examDuration || !totalMarks) {
+                alert("Please fill out all fields to set the exam.");
+                return;
+            }
+
+            // Save exam details in session storage
+            sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks);
+
+            // Message for user to confirm exam has been set
+            alert('Exam has been set successfully.');
+        }
+    </script>
+
+</body>
+</html>

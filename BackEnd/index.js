@@ -28,7 +28,7 @@ app.use(session({
     secret: 'secret-key',
     resave: false,
     saveUninitialized: false,           // ensures that a session is not created until data is stored in it.
-    cookie: { 
+    cookie: {
         maxAge: 1000 * 60 * 60 * 24     // 24 hours in milliseconds
         // secure: false,               // Use true if using HTTPS
         // maxAge: 60000 * 30           // Cookie expiration time 30 minutes session expiration
@@ -39,7 +39,7 @@ app.use(session({
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'admin',
+    password: 'root',
     database: 'smartgrade',
     waitForConnections: true,
     connectionLimit: 10,
@@ -65,31 +65,31 @@ app.post('/login-packet-admin', async (req, res) => {
     const { username, password } = req.body;
     console.log("Username: " + username);
     console.log("Password: " + password);
-  
+
     if (!username || !password) {
         console.log("Empty packet");
         return res.status(400).json({ message: 'Username and password are required.' });
     }
-  
+
     const connection = await pool.getConnection();
-  
+
     try {
         const sql = 'SELECT username, password FROM admin WHERE username = ?';
         const [result] = await connection.execute(sql, [username]);
         connection.release();
-    
+
         if (result.length === 0) {
             console.log("No UserName");
             return res.status(404).json({ message: 'No such username found.' });
         }
-    
+
         const user = result[0];
-    
+
         if (user.password !== password) {
             console.log("Wrong Pass");
             return res.status(401).json({ message: 'Incorrect password.' });
         }
-    
+
         console.log('Login successful, redirecting...');
         res.status(200).json({ redirectURL: '/admin' });
     } catch (error) {
@@ -102,45 +102,45 @@ app.post('/login-packet', async (req, res) => {
     const { username, password } = req.body;
     console.log("Username: " + username);
     console.log("Password: " + password);
-  
+
     if (!username || !password) {
         console.log("Empty packet");
         return res.status(400).json({ message: 'Username and password are required.' });
     }
-  
+
     const connection = await pool.getConnection();
-  
+
     try {
         const sql = 'SELECT userID, username, password, firstname, lastname, email, mobile, usertype, status FROM user_master WHERE username = ?';
         const [result] = await connection.execute(sql, [username]);
         connection.release();
-    
+
         if (result.length === 0) {
             console.log("No UserName");
             return res.status(404).json({ message: 'No such username found.' });
         }
-    
+
         const user = result[0];
-    
+
         if (user.password !== password) {
             console.log("Wrong Pass");
             return res.status(401).json({ message: 'Incorrect password.' });
         }
 
-        if(user.status !== "Active") {
+        if (user.status !== "Active") {
             console.log("User Not Active");
             return res.status(401).json({ message: 'Inactive User.' });
         }
 
-        req.session.userID=result[0].userID;
+        req.session.userID = result[0].userID;
         // req.session.username=result[0].username;
         // req.session.firstname=result[0].firstname;
         // req.session.lastname=result[0].lastname;
         // req.session.mobile=result[0].mobile;
         // req.session.email=result[0].email;
         // req.session.usertype=result[0].usertype;
-    
-        switch(user.usertype){
+
+        switch (user.usertype) {
             case 'Student':
                 console.log('Login successful, redirecting...');
                 res.status(200).json({ redirectURL: '/studentInterface' });
@@ -230,12 +230,12 @@ app.post('/register', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-  
+
         // Insert into user_master
         const sql = 'INSERT INTO user_master(username, password, firstname, lastname, usertype, mobile, email, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         const [result] = await connection.execute(sql, [username, pass, fname, lname, usertype, mobileno, email, new Date()]);
         // const newUserID = result.insertId; // Get the ID of the newly inserted user
-    
+
         // Respond with success
         res.status(200).json({ message: 'Registration successful!', receivedData: req.body });
         // res.status(200).json({ message: 'Registration successful!', userId: result.insertId });
@@ -251,12 +251,12 @@ app.post('/register', async (req, res) => {
 app.get('/admin', (req, res) => {
     const filePath = path.join(__dirname, '../Frontend/HTML/admin.html');
     res.sendFile(filePath, (err) => {
-      if (err) {
-        console.error('Error sending file:', err);
-        res.status(err.status || 500).send('Error sending file');
-      } else {
-        console.log('File sent:', filePath);
-      }
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(err.status || 500).send('Error sending file');
+        } else {
+            console.log('File sent:', filePath);
+        }
     });
 });
 
@@ -277,8 +277,8 @@ app.get('/student', async (req, res) => {
 async function sendEmail(userEmail, status) {
     const transporter = nodemailer.createTransport({
         service: 'gmail', // Or your email provider
-        secure : true,
-        port : 465,
+        secure: true,
+        port: 465,
         auth: {
             user: 'lastspacehero@gmail.com',
             pass: 'pvnu knbm fakv bzfz'
@@ -314,7 +314,7 @@ app.post('/status', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        
+
         // Update status query
         const [result] = await connection.query('UPDATE user_master SET status = ? WHERE userId = ?', [status, id]);
 
@@ -379,7 +379,7 @@ app.get('/question', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch questions data' });
     }
 });
-  
+
 app.get('/attempt', async (req, res) => {
     try {
         const [results] = await pool.query('SELECT attemptID AS id, examID, questionID, applicationID, selected_option, correct_option, marks_obt FROM Attempt_Master');
@@ -394,7 +394,7 @@ app.get('/attempt', async (req, res) => {
 app.get('/profile', (req, res) => {
     if (req.session.username) {
         // Assuming username is stored in session
-        res.json({ username: req.session.username,firstname:req.session.firstname,lastname:req.session.lastname,mobile:req.session.mobile,email:req.session.email,usertype:req.session.usertype});
+        res.json({ username: req.session.username, firstname: req.session.firstname, lastname: req.session.lastname, mobile: req.session.mobile, email: req.session.email, usertype: req.session.usertype });
     } else {
         res.status(401).json({ message: 'Not authenticated' });
     }
@@ -412,6 +412,117 @@ app.post('/logout', (req, res) => {
     });
 });
 
-app.listen(PORT, ()=> {
+app.post('/submit-exam', (req, res) => {
+    const { name, duration, questions } = req.body;
+
+    // Check if the examData object is valid
+    if (!name || !duration || !questions) {
+        return res.status(400).json({ success: false, message: 'Invalid exam data' });
+    }
+
+    console.log('Received exam data:', name);
+
+    // Insert exam into Exam_Master table
+    console.log("Success");
+    const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
+    pool.query(insertExamQuery, [name, duration], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ success: false });
+        }
+
+        console.log("Exam inserted successfully");
+        
+        const examId = result.insertId; // Retrieve the examId from the inserted exam
+
+        // Insert questions into Question_Master table
+        const insertQuestionQuery = `
+            INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) 
+            VALUES ?`;
+
+        // Prepare question values, including examId for each question
+        const questionValues = questions.map((question) => [
+            // examId,                         // Add examId for each question
+            question.questionText,          // The actual question text
+            question.options[0],            // Option A
+            question.options[1],            // Option B
+            question.options[2],            // Option C
+            question.options[3],            // Option D
+            question.correctOption          // Correct option
+        ]);
+
+        // Execute bulk insert for questions
+        pool.query(insertQuestionQuery, [questionValues], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ success: false });
+            }
+            console.log("Success");
+
+            res.json({ success: true });
+        });
+    });
+});
+
+
+// Endpoint to handle exam submission
+// app.post('/submit-exam', (req, res) => {
+//     const { name, duration, questions } = req.body;
+
+//     // Check if the examData object is valid
+//     if (!name || !duration || !questions) {
+//         return res.status(400).json({ success: false, message: 'Invalid exam data' });
+//     }
+
+//     console.log('Received exam data:', name);
+
+//     // Insert exam into Exam_Master table
+//     const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
+//     pool.query(insertExamQuery, [name, duration], (err, result) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(500).json({ success: false });
+//         }
+
+//         console.log("Success");
+//     });
+
+//     // const examId = result.insertId;
+
+//     // Insert questions into Question_Master table
+//     // const insertQuestionQuery = `INSERT INTO Question_Master (exam_id, question_text, option_1, option_2, option_3, option_4, correct_option) VALUES ?`;
+//     const insertQuestionQuery = `INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) VALUES ?`;
+//     const questionValues = questions.map((question) => [
+//         // examId,
+//         question.questionText,
+//         question.options[0],
+//         question.options[1],
+//         question.options[2],
+//         question.options[3],
+//         question.correctOption
+//     ]);
+
+//     // Create a query with placeholders for multiple rows
+//     const valuesPlaceholders = questionValues.map(() => '(?, ?, ?, ?, ?, ?, ?)').join(', ');
+
+//     // Final query
+//     insertQuestionQuery += valuesPlaceholders;
+
+//     // Flatten the array of values
+//     const flattenedValues = questionValues.flat();
+
+//     console.log(pool.format(insertQuestionQuery, flattenedValues));
+
+//     pool.query(insertQuestionQuery, flattenedValues, (err, result) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(500).json({ success: false });
+//         }
+
+//         res.json({ success: true });
+//     });
+// });
+
+app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);
 });
