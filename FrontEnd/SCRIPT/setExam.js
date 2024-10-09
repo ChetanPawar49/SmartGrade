@@ -1,6 +1,7 @@
 let questionCount = 0;
 const questionsArray = [];
 
+// Function to generate inputs for the questions
 function generateQuestionInputs() {
     const numQuestions = parseInt(document.getElementById('num-questions').value);
     if (isNaN(numQuestions) || numQuestions <= 0) {
@@ -16,23 +17,23 @@ function generateQuestionInputs() {
         formContainer.innerHTML += `
             <div class="question-box">
                 <h3>Question ${i + 1}</h3>
-                <input type="text" id="question-${i}" placeholder="Enter question text">
+                <input type="text" id="question-${i}" placeholder="Enter question text" required>
                 <div class="options-container" id="options-${i}">
                     <div class="option">
-                        <input type="radio" name="answer-${i}" value="0">
-                        <input type="text" placeholder="Option 1">
+                        <input type="radio" name="answer-${i}" value="0" required>
+                        <input type="text" placeholder="Option 1" required>
                     </div>
                     <div class="option">
-                        <input type="radio" name="answer-${i}" value="1">
-                        <input type="text" placeholder="Option 2">
+                        <input type="radio" name="answer-${i}" value="1" required>
+                        <input type="text" placeholder="Option 2" required>
                     </div>
                     <div class="option">
-                        <input type="radio" name="answer-${i}" value="2">
-                        <input type="text" placeholder="Option 3">
+                        <input type="radio" name="answer-${i}" value="2" required>
+                        <input type="text" placeholder="Option 3" required>
                     </div>
                     <div class="option">
-                        <input type="radio" name="answer-${i}" value="3">
-                        <input type="text" placeholder="Option 4">
+                        <input type="radio" name="answer-${i}" value="3" required>
+                        <input type="text" placeholder="Option 4" required>
                     </div>
                 </div>
             </div>
@@ -44,6 +45,7 @@ function generateQuestionInputs() {
     document.getElementById('success-message').classList.add('hidden');
 }
 
+// Function to submit the questions
 function submitQuestions() {
     questionsArray.length = 0;
     const formElements = document.querySelectorAll('.question-box');
@@ -75,11 +77,44 @@ function submitQuestions() {
         });
 
         document.getElementById('alert-message').classList.add('hidden');
-        document.getElementById('success-message').textContent = 'Test created successfully!';
+        document.getElementById('success-message').textContent = 'Questions submitted successfully!';
         document.getElementById('success-message').classList.remove('hidden');
+
+        // Show the scheduling and publish form
+        document.getElementById('schedule-form').classList.remove('hidden');
     } else {
         document.getElementById('alert-message').textContent = 'Please complete all questions with exactly four options before submitting.';
         document.getElementById('alert-message').classList.remove('hidden');
         document.getElementById('success-message').classList.add('hidden');
     }
 }
+
+// Function to schedule and publish the exam
+function scheduleAndPublishExam() {
+    const examTitle = document.getElementById('exam-title').value;
+    const examDate = document.getElementById('exam-date').value;
+    const examTime = document.getElementById('exam-time').value;
+
+    if (!examTitle || !examDate || !examTime) {
+        alert("Please fill out all the exam scheduling fields.");
+        return;
+    }
+
+    const examDetails = {
+        title: examTitle,
+        date: examDate,
+        time: examTime,
+        questions: questionsArray
+    };
+
+    // Send exam details to the server (this could be an API call)
+    console.log("Exam Scheduled and Published:", examDetails);
+    
+    alert('Exam has been scheduled and published successfully!');
+    // Optionally clear the form or redirect to another page
+}
+
+// Event listeners
+document.getElementById('generate-questions').addEventListener('click', generateQuestionInputs);
+document.getElementById('submit-questions').addEventListener('click', submitQuestions);
+document.getElementById('publish-exam').addEventListener('click', scheduleAndPublishExam);

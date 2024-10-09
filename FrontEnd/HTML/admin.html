@@ -223,104 +223,92 @@
                     }
                 });
             });
-
-            // Function to fetch and populate data
             function fetchData(endpoint, tableId) {
-                fetch(endpoint)
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data); // Log the entire data to check the API response
+        fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            if (tableBody) {
+                tableBody.innerHTML = ''; // Clear any existing rows
 
-                    const tableBody = document.querySelector(`#${tableId} tbody`);
-                    if (tableBody) {
-                        tableBody.innerHTML = ''; // Clear any existing rows
-                            
-                        data.forEach(item => {
-                            // console.log(`Processing item ID: ${item.id}, Status: ${item.status}`); // Log each item's status
-                            const row = document.createElement('tr');
-                            // <!-- row.innerHTML = Object.values(item).map(value => `<td>${value}</td>`).join(''); -->
-                            row.innerHTML = `
-                                <td>${item.id || ''}</td>
-                                <td>${item.name || ''}</td>
-                                <td>${item.email || ''}</td>
-                                <td>${item.usertype || ''}</td>
-                                <td>
-                                    <select class="form-control status-select" data-id="${item.id}">
-                                    <!-- Hidden default option -->
-                                    <option value="" ${!item.status ? 'selected' : ''} hidden>${item.status}</option>
-                                    <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
-                                </select>
-
-                                </td>
-                                <td><button class="btn btn-primary update-status-btn" data-id="${item.id}">Update Status</button></td>
-                            `;
-                            tableBody.appendChild(row);
-                        });
-
-                        // Attach click event listeners to buttons
-                        document.querySelectorAll('.update-status-btn').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const id = this.getAttribute('data-id');
-                                const select = document.querySelector(`.status-select[data-id="${id}"]`);
-                                const status = select ? select.value : '';
-                        
-                                console.log('Selected ID:', id);
-                                console.log('Selected Status:', status);
-                        
-                                if (status) {
-                                    updateStatus(id, status);
-                                } else {
-                                    console.error('Status is undefined or empty');
-                                }
-                            });
-                        });
-                    } else {
-                        console.error(`Table with id ${tableId} not found.`);
-                    }
-                })
-                .catch(error => console.error('Error fetching data:', error));
-            }
-
-            // Function to post data to the /status API
-            function updateStatus(id, status) {
-                fetch('/status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id, status })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(`Status updated and email sent successfully! User is now ${status}.`);
-                    console.log('Response from server:', data); // Debug: log server response
-
-
-                    // Trigger email sending after the status is updated
-      //  sendEmail(id, status);
-
-                    // Reload the data after updating the status to reflect the most recent status
-                    fetchData('/student', 'applicant-table');
-                    fetchData('/teacher', 'organizer-table');
-                    fetchData('/exam', 'exams-table');
-                    fetchData('/question', 'questions-table');
-                    fetchData('/attempt', 'attempts-table');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error updating status.');
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id || ''}</td>
+                        <td>${item.name || ''}</td>
+                        <td>${item.email || ''}</td>
+                        <td>${item.usertype || ''}</td>
+                        <td>
+                            <select class="form-control status-select" data-id="${item.id}">
+                                <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
+                                <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                            </select>
+                        </td>
+                        <td><button class="btn btn-primary update-status-btn" data-id="${item.id}">Update Status</button></td>
+                    `;
+                    tableBody.appendChild(row);
                 });
-            }
 
-            // Initial Fetch and populate data for each table
+                // Reattach click event listeners to buttons
+                document.querySelectorAll('.update-status-btn').forEach(button => {
+                    // Clone the button to remove existing event listeners
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+
+                    newButton.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const select = document.querySelector(`.status-select[data-id="${id}"]`);
+                        const status = select ? select.value : '';
+
+                        if (status) {
+                            updateStatus(id, status);
+                        } else {
+                            console.error('Status is undefined or empty');
+                        }
+                    });
+                });
+            } else {
+                console.error(`Table with id ${tableId} not found.`);
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to post data to the /status API
+    function updateStatus(id, status) {
+        console.log('updateStatus triggered');
+        fetch('/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(`Status updated and email sent successfully! User is now ${status}.`);
+            console.log('Response from server:', data);
+
+            // Reload the data after updating the status to reflect the most recent status
             fetchData('/student', 'applicant-table');
             fetchData('/teacher', 'organizer-table');
             fetchData('/exam', 'exams-table');
             fetchData('/question', 'questions-table');
             fetchData('/attempt', 'attempts-table');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating status.');
         });
+    }
 
+    // Initial Fetch and populate data for each table
+    fetchData('/student', 'applicant-table');
+    fetchData('/teacher', 'organizer-table');
+    fetchData('/exam', 'exams-table');
+    fetchData('/question', 'questions-table');
+    fetchData('/attempt', 'attempts-table');
+});
         // Logout function
         function logout() {
             // Perform logout action here

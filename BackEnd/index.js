@@ -412,6 +412,28 @@ app.post('/logout', (req, res) => {
     });
 });
 
+
+
+
+
+
+
+  //hjandling the teacher question preview
+  app.get('/teacherquestion', (req, res) => {
+
+
+    const filePath = path.join(__dirname, '../teacher.html');
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        res.status(err.status || 500).send('Error sending file');
+      } else {
+        console.log('File sent:', filePath);
+      }
+    });
+});
+
+
 app.post('/submit-exam', (req, res) => {
     const { name, duration, questions } = req.body;
 

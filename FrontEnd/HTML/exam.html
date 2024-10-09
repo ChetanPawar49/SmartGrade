@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/exam.css">
+   <link rel="stylesheet" href="/css/exam.css">
+    <title>Quiz Page with Timer</title>
     
-    <title>Quiz Page</title>
+
 </head>
+
 <body>
+    
     <div class="quiz-container">
-        <div class="progress-container">
-            <!-- Progress circles will be dynamically inserted here -->
-        </div>
+
+        <!-- Progress container on the left -->
+        <div class="progress-container" id="progress-container"></div>
+    
+        <!-- Quiz content on the right -->
         <div id="quiz">
+            <div class="timer-container">
+                <div class="timer-bar" id="timer-bar"></div>
+                <div class="time-left" id="time-left">1:00</div>
+            </div>
+    
             <form id="quiz-form">
                 <div class="question-container">
                     <div class="question" id="question-text">Question 1: What is the time complexity of binary search?</div>
@@ -27,6 +38,8 @@
                 </div>
             </form>
         </div>
+    
+        <!-- Result content -->
         <div id="result" class="result-container">
             <h2>Exam Submitted Successfully!</h2>
             <p id="result-message">Thank you for completing the quiz. Your responses have been recorded.</p>
@@ -34,6 +47,14 @@
         </div>
     </div>
     
-    <script src="/js/exam.js"></script>
+    
+
+    <!-- Script for Quiz functionality -->
+    <script src="/js/exam.js">
+      
+
+    </script>
+
 </body>
+
 </html>
