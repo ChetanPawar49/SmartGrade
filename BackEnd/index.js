@@ -412,12 +412,6 @@ app.post('/logout', (req, res) => {
     });
 });
 
-
-
-
-
-
-
   //hjandling the teacher question preview
   app.get('/teacherquestion', (req, res) => {
 
@@ -434,57 +428,182 @@ app.post('/logout', (req, res) => {
 });
 
 
-app.post('/submit-exam', (req, res) => {
-    const { name, duration, questions } = req.body;
+// POST route to handle adding questions
+app.post('/addQuestion', async (req, res) => {
+    const { question, option1, option2, option3, option4, correctOption } = req.body; // Extract data from request body
+    console.log(req.body);
 
-    // Check if the examData object is valid
-    if (!name || !duration || !questions) {
-        return res.status(400).json({ success: false, message: 'Invalid exam data' });
+    // console.log(req.session.examID);
+    const examID = req.session.examID; // Retrieve the exam ID from the session
+
+    if (!examID) {
+        return res.status(400).json({ message: 'Exam ID not found in session' });
     }
 
-    console.log('Received exam data:', name);
+    let connection;
+    try {
+        // Get a connection from the pool
+        connection = await pool.getConnection();
 
-    // Insert exam into Exam_Master table
-    console.log("Success");
-    const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
-    pool.query(insertExamQuery, [name, duration], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ success: false });
-        }
+        // Prepare the SQL query to insert the question and options into the Question_Master table
+        const sql = `
+            INSERT INTO Question_Master (
+                examID, 
+                question, 
+                optionA, 
+                optionB, 
+                optionC, 
+                optionD, 
+                answer_key, 
+                timestamp
+            ) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
 
-        console.log("Exam inserted successfully");
-        
-        const examId = result.insertId; // Retrieve the examId from the inserted exam
+        // Prepare the options
+        // const [optionA, optionB, optionC, optionD] = options; // Assumes options array contains 4 elements
 
-        // Insert questions into Question_Master table
-        const insertQuestionQuery = `
-            INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) 
-            VALUES ?`;
-
-        // Prepare question values, including examId for each question
-        const questionValues = questions.map((question) => [
-            // examId,                         // Add examId for each question
-            question.questionText,          // The actual question text
-            question.options[0],            // Option A
-            question.options[1],            // Option B
-            question.options[2],            // Option C
-            question.options[3],            // Option D
-            question.correctOption          // Correct option
+        // Execute the SQL query
+        const [result] = await connection.execute(sql, [
+            // examID,
+            req.session.examID,
+            question,
+            option1,
+            option2,
+            option3,
+            option4,
+            correctOption, // e.g., 'optionA', 'optionB', etc.
+            new Date() // Automatically sets current timestamp
         ]);
 
-        // Execute bulk insert for questions
-        pool.query(insertQuestionQuery, [questionValues], (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ success: false });
-            }
-            console.log("Success");
+        // Send a success response
+        res.status(200).json({ message: 'Registration successful!', receivedData: req.body });
 
-            res.json({ success: true });
-        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Error processing request' });
+    } finally {
+        if (connection) connection.release(); // Release the connection back to the pool
+    }
+});
+
+//Set Test : SetTest
+
+app.get('/SetTest', (req, res) => {
+    console.log("serving test");
+    const filePath = path.join(__dirname, '../Frontend/HTML/teacherQue.html');
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(err.status || 500).send('Error sending file');
+        } else {
+            res.fil
+            console.log('File sent:', filePath);
+        }
     });
 });
+
+//Exam Creation:
+
+app.post('/addExam', async (req, res) => {
+
+    console.log("Adding Exam");
+    const { examName, examDate, examTime, examDuration, totalMarks, passingMarks } = req.body;
+
+    let connection;
+    // console.log("TeacherID:" + req.session.myid);
+    try {
+        connection = await pool.getConnection();
+
+        // Insert into user_master
+        const sql = 'INSERT INTO exam_master(name, start_date, start_time, duration, total_marks, passing_marks, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await connection.execute(sql, [examName, examDate, examTime, examDuration, totalMarks, passingMarks, new Date()]);
+
+        // Get the generated examID from the insert result
+        const newExamID = result.insertId;
+
+        // Store the examID in the session
+        req.session.examID = newExamID;
+        // sessionStorage.setItem('examID', newExamID);
+        console.log(req.session);
+
+        // const newexamID = result.insertId; // Get the ID of the newly inserted user
+        // Respond with success
+
+        // req.session.examID = newexamID;
+        res.status(200).json({ message: 'Registration successful!', redirectURL: "/SetTest", receivedData: req.body });
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error processing request.');
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Route to send exam data as a response
+app.get('/api/exam', async (req, res) => {
+    try {
+        console.log("Inside Exam...");
+        const [results] = await pool.query('SELECT examID , name, start_date, start_time, duration, total_marks FROM Exam_Master');
+        res.json(results);
+    } catch (err) {
+        console.error('Error fetching exams data:', err);
+        res.status(500).json({ error: 'Failed to fetch exams data' });
+    }
+});
+
+// app.post('/submit-exam', (req, res) => {
+//     const { name, duration, questions } = req.body;
+
+//     // Check if the examData object is valid
+//     if (!name || !duration || !questions) {
+//         return res.status(400).json({ success: false, message: 'Invalid exam data' });
+//     }
+
+//     console.log('Received exam data:', name);
+
+//     // Insert exam into Exam_Master table
+//     console.log("Success");
+//     const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
+//     pool.query(insertExamQuery, [name, duration], (err, result) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(500).json({ success: false });
+//         }
+
+//         console.log("Exam inserted successfully");
+
+//         const examId = result.insertId; // Retrieve the examId from the inserted exam
+
+//         // Insert questions into Question_Master table
+//         const insertQuestionQuery = `
+//             INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) 
+//             VALUES ?`;
+
+//         // Prepare question values, including examId for each question
+//         const questionValues = questions.map((question) => [
+//             // examId,                         // Add examId for each question
+//             question.questionText,          // The actual question text
+//             question.options[0],            // Option A
+//             question.options[1],            // Option B
+//             question.options[2],            // Option C
+//             question.options[3],            // Option D
+//             question.correctOption          // Correct option
+//         ]);
+
+//         // Execute bulk insert for questions
+//         pool.query(insertQuestionQuery, [questionValues], (err, result) => {
+//             if (err) {
+//                 console.error(err);
+//                 return res.status(500).json({ success: false });
+//             }
+//             console.log("Success");
+
+//             res.json({ success: true });
+//         });
+//     });
+// });
 
 
 // Endpoint to handle exam submission

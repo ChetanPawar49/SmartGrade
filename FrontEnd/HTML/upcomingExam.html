@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Exams</title>
+    <style>
+        /* Styling for the upcoming exams section */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .upcoming-exams {
+            width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .exam-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .exam-item:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Section to display upcoming exams -->
+    <div class="upcoming-exams" id="upcomingExams">
+        <h2>Upcoming Exam</h2>
+        <!-- Exam details will be added here dynamically -->
+    </div>
+
+    <script>
+        // Fetch exam data from the server (make sure the endpoint matches your backend)
+        fetch('/api/exam')
+            .then(response => response.json())  // Parse JSON response
+            .then(examData => {
+                // Check if exam data exists
+                if (examData) {
+                    // Create a new exam entry
+                    const examItem = document.createElement("div");
+                    examItem.classList.add("exam-item");
+                    examItem.innerHTML = `
+                            <strong>Exam ID:</strong> ${examData.examID} <br>
+                            <strong>Exam Name:</strong> ${examData.examName} <br>
+                            <strong>Exam Date:</strong> ${examData.examDate} <br>
+                            <strong>Exam Time:</strong> ${examData.examTime} <br>
+                            <strong>Duration:</strong> ${examData.examDuration} minutes <br>
+                            <strong>Total Marks:</strong> ${examData.totalMarks} <br>
+                            <!-- <strong>Passing Marks:</strong> ${examData.passingMarks} -->
+                        `;
+
+                    // Add the new exam to the upcoming exams section
+                    document.getElementById("upcomingExams").appendChild(examItem);
+                } else {
+                    document.getElementById("upcomingExams").innerHTML = "<p>No upcoming exams available.</p>";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching exam data:', error);
+                document.getElementById("upcomingExams").innerHTML = "<p>Failed to fetch exam data.</p>";
+            });
+    </script>
+
+</body>
+
+</html>

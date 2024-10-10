@@ -1,5 +1,11 @@
 let questionCount = 0;
 
+const button1 = document.getElementById('submitQuestion');
+
+button1.addEventListener('click', function () {
+    submitQuestions();
+});
+
 function generateQuestionInputs() {
     const numQuestions = parseInt(document.getElementById('num-questions').value);
 
@@ -96,24 +102,20 @@ function removeQuestion(index) {
     questionBox.remove();
 }
 
-function submitQuestions() {
+async function submitQuestions() {
     // const examName = document.getElementById('examName').value; // Removed input field for exam name
-    const examName = sessionStorage.getItem('examName'); //Getting exam name from session storage
-    const examDuration = sessionStorage.getItem('examDuration');
+    // const examName = sessionStorage.getItem('examName'); //Getting exam name from session storage
+    // const examDuration = sessionStorage.getItem('examDuration');
     const examQuestions = [];
-    // const previewExamName = document.getElementById('preview-exam-name');
-    // const previewExamQuestions = document.getElementById('exam-questions');
-    // const previewExamTime = document.getElementById('exam-time-display');
-
-    // previewExamName.innerHTML = `Exam: ${examName || 'null'}`; // Display 'null' if no exam name
-    // previewExamQuestions.innerHTML = '';
 
     for (let i = 0; i < questionCount; i++) {
         const questionText = document.getElementById(`question-${i}`).value;
         const options = document.querySelectorAll(`#options-container-${i} .option`);
-        // const questionPreview = document.createElement('div');
-        // questionPreview.classList.add('preview-question');
-        // questionPreview.innerHTML = `<h4>Q${i + 1}: ${questionText}</h4>`;
+
+        if (!questionText.trim()) {
+            alert("Please enter a question.");
+            return;
+        }
 
         const correctOption = document.querySelector('input[type="radio"]').checked;
         // options.forEach((option, index) => {
@@ -123,43 +125,83 @@ function submitQuestions() {
         // });
 
         const questionData = {
-            questionText,
-            options,
-            correctOption: correctOption.value,
+            question: questionText,
+            options: options,
+            correctOption: correctOption
         };
+
+        // const questionData = {
+        //     questionText,
+        //     options,
+        //     correctOption: correctOption.value,
+        // };
 
         examQuestions.push(questionData);
         // previewExamQuestions.appendChild(questionPreview);
     }
 
     const examData = {
-        name: examName,
-        duration: examDuration,
         questions: examQuestions,
     };
+
+    try {
+        console.log("Exam Creation");
+        const response = await fetch('/addQuestion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(examData)
+        });
+
+        // Check if the response is OK and is in JSON format
+        if (response.ok) {
+            const data = await response.json();  // Only try parsing if response is OK
+            console.log("Success:", data.message);
+        } else {
+            // Log the raw response if it's not JSON (like an error page)
+            const errorText = await response.text();
+            console.error('Error Response Status:', response.status);
+            console.error('Response error:', errorText);
+            alert('Error: ' + errorText);
+        }
+        
+        // const data = await response.json();
+        // if (response.ok) {
+        //     console.log("Success");
+        //     // console.log(questionData.questionNumber + " Added");
+        //     // Redirect or clear the form as needed
+        //     //window.location.href = data.redirectURL;
+        // } else {
+        //     alert('Registration failed: ' + data.message);
+        // }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error submitting the form.');
+    }
 
     // document.getElementById('exam-time-display').innerHTML = `Duration: null`; // Show null for duration
     // document.getElementById('exam-preview').classList.remove('hidden'); // Show the preview
 
-    fetch('http://localhost:3000/submit-exam', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(examData),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById("success-message").textContent = "Exam submitted successfully!";
-            document.getElementById("success-message").classList.remove("hidden");
-        } else {
-            document.getElementById("alert-message").textContent = "Error submitting exam.";
-            document.getElementById("alert-message").classList.remove("hidden");
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        console.log("Error");
-    });
+    // fetch('http://localhost:3000/submit-exam', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(examData),
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     if (data.success) {
+    //         document.getElementById("success-message").textContent = "Exam submitted successfully!";
+    //         document.getElementById("success-message").classList.remove("hidden");
+    //     } else {
+    //         document.getElementById("alert-message").textContent = "Error submitting exam.";
+    //         document.getElementById("alert-message").classList.remove("hidden");
+    //     }
+    // })
+    // .catch((error) => {
+    //     console.error('Error:', error);
+    //     console.log("Error");
+    // });
 }

@@ -17,6 +17,7 @@
         <div class="nav-menu">
             <a href="#" id="Dashboard">Dashboard</a>
             <a href="#" id="Setexam">Set Exam</a>
+            <a href="#" id="Exam">Exams</a>
             <a href="#">Student Result's</a>
             <a href="#" onclick="logout()">Logout</a>
         </div>
@@ -35,6 +36,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('Dashboard').addEventListener('click', () => Screenchange('teacherDash.html'));
             document.getElementById('Setexam').addEventListener('click', () => Screenchange('teacherExam.html'));
+            document.getElementById('Exam').addEventListener('click', () => Screenchange('upcomingExam.html'));
             <!-- document.getElementById('Setexam').addEventListener('click', () => Screenchange('setExam.html')); -->
         });
 
