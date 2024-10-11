@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam List Form</title>
+    <link rel="stylesheet" href="/CSS/teacherExam.css">
+</head>
+
+<body>
+    <h2>All Exams</h2>
+
+    <form id="examForm">
+        <div id="examListContainer">
+            <!-- Data will be dynamically populated here -->
+        </div>
+        <!-- <div>
+            <button type="submit">Submit</button>
+        </div> -->
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchExams();
+        });
+
+        // Function to fetch exams from the backend and populate the form
+        async function fetchExams() {
+            try {
+                const response = await fetch('/getExams', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching exam data');
+                }
+
+                const data = await response.json();
+                console.log(data);
+
+                if (data.success) {
+                    const examListContainer = document.getElementById('examListContainer');
+                    data.exams.forEach(exam => {
+                        const examDiv = document.createElement('div');
+                        examDiv.classList.add('exam-entry');
+
+                        examDiv.innerHTML = `
+                            <div class="exam-card">
+                                <h3 id="namee_${exam.examID}">Exam: ${exam.name}</h3>
+                                <div class="exam-details">
+                                    <div><span>Exam ID:</span> ${exam.examID}</div>
+                                    <div><span>Exam Name:</span> ${exam.name}</div>
+                                    <div><span>Exam Date:</span> ${exam.start_date}</div>
+                                    <div><span>Exam Time:</span> ${exam.start_time}</div>
+                                    <div><span>Duration (Minutes):</span> ${exam.duration}</div>
+                                    <div><span>Total Marks:</span> ${exam.total_marks}</div>
+                                    <div><span>Passing Marks:</span> ${exam.passing_marks}</div>
+                                </div>
+
+                            </div>
+                        `;
+
+                        examListContainer.appendChild(examDiv);
+                    });
+                } else {
+                    console.error('Failed to fetch exams:', data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching exam data.');
+            }
+        }
+    </script>
+</body>
+
+</html>

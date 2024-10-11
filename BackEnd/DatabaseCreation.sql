@@ -17,7 +17,7 @@ CREATE TABLE `User_Master` (
   `lastname` varchar(10),
   `usertype` enum('Student', 'Teacher') NOT NULL,
   `mobile` varchar(15) NOT NULL,
-  `email` varchar(50) NOT NULL,
+  `email` varchar(25) NOT NULL,
   `status` enum('Pending', 'Active', 'Inactive') DEFAULT 'Pending',
   `timestamp` timestamp NOT NULL
 );
@@ -38,32 +38,44 @@ CREATE TABLE `Student` (
   `timestamp` timestamp NOT NULL
 );
 
+-- CREATE TABLE `Exam_Master` (
+--   `examID` int UNIQUE PRIMARY KEY NOT NULL,
+--   `name` varchar(15) NOT NULL,
+--   `app_start_date` date NOT NULL,
+--   `app_end_date` date NOT NULL,
+--   `exam_start_time` time NOT NULL,
+--   `exam_end_date` date NOT NULL,
+--   `exam_end_time` time NOT NULL,
+--   `total_marks` int NOT NULL,
+--   `passing_marks` int NOT NULL,
+--   `status` enum('Pending', 'Completed') NOT NULL,
+--   `timestamp` timestamp NOT NULL
+-- );
+
 CREATE TABLE `Exam_Master` (
-  `examID` int UNIQUE PRIMARY KEY NOT NULL,
-  `name` varchar(15) NOT NULL,
-  `app_start_date` date NOT NULL,
-  `app_end_date` date NOT NULL,
-  `exam_start_time` time NOT NULL,
-  `exam_end_date` date NOT NULL,
-  `exam_end_time` time NOT NULL,
-  `total_marks` int NOT NULL,
-  `passing_marks` int NOT NULL,
-  `status` enum('Pending', 'Completed') NOT NULL,
-  `timestamp` timestamp NOT NULL
+	`examID` int NOT NULL UNIQUE AUTO_INCREMENT,
+    `teacherId` int NOT NULL,
+	`name` varchar(15) NOT NULL,
+	`start_date` DATE NOT NULL,
+    `start_time` TIME NOT NULL,
+	`duration` INT NOT NULL,
+    `total_marks` INT NOT NULL,
+    `passing_marks` INT NOT NULL,
+	`timestamp` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `Question_Master` (
-  `questionID` int UNIQUE PRIMARY KEY NOT NULL,
+  `questionID` int NOT NULL UNIQUE AUTO_INCREMENT,
   `examID` int NOT NULL,
-  `questiontype` varchar(20) NOT NULL,
-  `question` varchar(70) NOT NULL,
-  `optionA` varchar(40) NOT NULL,
-  `optionB` varchar(40) NOT NULL,
-  `optionC` varchar(40) NOT NULL,
-  `optionD` varchar(40) NOT NULL,
+  -- `questiontype` varchar(20) NOT NULL, 
+  `question` TEXT NOT NULL,
+  `optionA` varchar(150) NOT NULL,
+  `optionB` varchar(150) NOT NULL,
+  `optionC` varchar(150) NOT NULL,
+  `optionD` varchar(150) NOT NULL,
   `answer_key` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
   `question_marks` int NOT NULL,
-  `timestamp` timestamp NOT NULL
+  `timestamp` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `Attempt_Master` (
@@ -92,6 +104,16 @@ ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
 
 SELECT * FROM user_master;
+SELECT * FROM question_master;
+SELECT * FROM exam_master;
+
+drop table exam_master;
+drop table question_master;
+
+truncate question_master;
+truncate exam_master;
+
+alter table question_master drop timestamp;
 
 SHOW TABLES;
 

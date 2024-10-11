@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam List</title>
+    <link rel="stylesheet" href="/CSS/teacherExam.css">
+</head>
+
+<body>
+    <h2>All Exams</h2>
+
+    <table id="examTable" border="1">
+        <thead>
+            <tr>
+                <th>Exam Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Duration (Minutes)</th>
+                <th>Total Marks</th>
+                <th>Passing Marks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically populated here -->
+        </tbody>
+    </table>
+
+    <!-- <script src="/js/fetchExams.js"></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchExams();
+        });
+
+        // Function to fetch exams from the backend
+        async function fetchExams() {
+            try {
+                const response = await fetch('/getExams', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching exam data');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const examTableBody = document.querySelector('#examTable tbody');
+                    data.exams.forEach(exam => {
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${exam.examName}</td>
+                            <td>${exam.examDate}</td>
+                            <td>${exam.examTime}</td>
+                            <td>${exam.examDuration}</td>
+                            <td>${exam.totalMarks}</td>
+                            <td>${exam.passingMarks}</td>
+                        `;
+
+                        examTableBody.appendChild(row);
+                    });
+                } else {
+                    console.error('Failed to fetch exams:', data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching exam data.');
+            }
+        }        
+    </script>
+</body>
+
+</html>

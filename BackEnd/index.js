@@ -412,25 +412,49 @@ app.post('/logout', (req, res) => {
     });
 });
 
-  //hjandling the teacher question preview
-  app.get('/teacherquestion', (req, res) => {
+// Route to fetch all exams
+app.get('/getExams', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        // const [rows] = await connection.query('SELECT * FROM Exam_Master where examID=?');
+        // const sql = await connection.query('SELECT * FROM Exam_Master WHERE examID=?');
+        console.log(req.session.userID);
+        
+        // Using connection.execute for parameterized query
+        const [result] = await connection.execute('SELECT * FROM Exam_Master WHERE teacherId = ?', [req.session.userID]);
+        
+        // console.log(result);
+        // const [result] = await connection.execute(sql, [req.session.examID]);
+        res.json({ success: true, exams: result });
+        // res.json({ success: true, exams: rows });
+        
+        // Return the fetched data as JSON
+        // res.json({ success: true, exams: rows });
+    } catch (error) {
+        console.error('Error fetching exams:', error);
+        res.status(500).json({ success: false, message: 'Error fetching exams.' });
+    } finally {
+        if (connection) connection.release();
+    }
+});
 
-
+//handling the teacher question preview
+app.get('/teacherquestion', (req, res) => {
     const filePath = path.join(__dirname, '../teacher.html');
     res.sendFile(filePath, (err) => {
-      if (err) {
-        console.error('Error sending file:', err);
-        res.status(err.status || 500).send('Error sending file');
-      } else {
-        console.log('File sent:', filePath);
-      }
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(err.status || 500).send('Error sending file');
+        } else {
+            console.log('File sent:', filePath);
+        }
     });
 });
 
-
 // POST route to handle adding questions
 app.post('/addQuestion', async (req, res) => {
-    const { question, option1, option2, option3, option4, correctOption } = req.body; // Extract data from request body
+    const { question, option1, option2, option3, option4, correctOption, question_marks } = req.body; // Extract data from request body
     console.log(req.body);
 
     // console.log(req.session.examID);
@@ -455,9 +479,10 @@ app.post('/addQuestion', async (req, res) => {
                 optionC, 
                 optionD, 
                 answer_key, 
+                question_marks, 
                 timestamp
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         // Prepare the options
@@ -473,6 +498,7 @@ app.post('/addQuestion', async (req, res) => {
             option3,
             option4,
             correctOption, // e.g., 'optionA', 'optionB', etc.
+            question_marks,
             new Date() // Automatically sets current timestamp
         ]);
 
@@ -511,13 +537,13 @@ app.post('/addExam', async (req, res) => {
     const { examName, examDate, examTime, examDuration, totalMarks, passingMarks } = req.body;
 
     let connection;
-    // console.log("TeacherID:" + req.session.myid);
+    console.log("TeacherID:" + req.session.userID);
     try {
         connection = await pool.getConnection();
 
         // Insert into user_master
-        const sql = 'INSERT INTO exam_master(name, start_date, start_time, duration, total_marks, passing_marks, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const [result] = await connection.execute(sql, [examName, examDate, examTime, examDuration, totalMarks, passingMarks, new Date()]);
+        const sql = 'INSERT INTO exam_master(teacherId, name, start_date, start_time, duration, total_marks, passing_marks, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await connection.execute(sql, [req.session.userID, examName, examDate, examTime, examDuration, totalMarks, passingMarks, new Date()]);
 
         // Get the generated examID from the insert result
         const newExamID = result.insertId;

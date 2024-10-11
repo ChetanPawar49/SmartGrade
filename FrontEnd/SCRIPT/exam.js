@@ -46,7 +46,6 @@ function updateProgressCircles() {
     });
 }
 
-
 function showQuestion(index) {
     const question = questions[index];
     document.getElementById('question-text').textContent = `Question ${index + 1}: ${question.question}`;
@@ -90,10 +89,6 @@ function selectOption(selectedOption) {
     updateProgressCircles(); // Update progress circles on option selection
 }
 
-
-
-
-
 document.getElementById('next-button').addEventListener('click', () => {
     if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
@@ -108,7 +103,7 @@ document.getElementById('prev-button').addEventListener('click', () => {
     }
 });
 
-document.getElementById('quiz-form').addEventListener('submit', (event) => { 
+document.getElementById('quiz-form').addEventListener('submit', (event) => {
     event.preventDefault();
 
     fetch('/save-answers', {
@@ -118,22 +113,21 @@ document.getElementById('quiz-form').addEventListener('submit', (event) => {
         },
         body: JSON.stringify({ answers })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Your answers have been submitted successfully!', data);
-        showResult();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        console.log('There was a problem submitting your answers. Please try again.');
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Your answers have been submitted successfully!', data);
+            showResult();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('There was a problem submitting your answers. Please try again.');
+        });
 });
-
 
 // Timer setup
 function startTimer(duration, display, progressBar) {
