@@ -58,7 +58,8 @@ CREATE TABLE `Exam_Master` (
 	`name` varchar(15) NOT NULL,
 	`start_date` DATE NOT NULL,
     `start_time` TIME NOT NULL,
-	`duration` INT NOT NULL,
+	`end_time` TIME NOT NULL,
+    -- `duration` INT NOT NULL,
     `total_marks` INT NOT NULL,
     `passing_marks` INT NOT NULL,
 	`timestamp` timestamp DEFAULT CURRENT_TIMESTAMP
