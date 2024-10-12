@@ -412,6 +412,21 @@ app.post('/logout', (req, res) => {
     });
 });
 
+app.get('/exam-schedule', checkAuth, async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT examID, name, start_date, start_time, duration, total_marks, passing_marks FROM exam_master WHERE start_date = CURDATE()');
+
+        if (rows.length > 0) {
+            res.json(rows); // Send today's exam data as JSON
+        } else {
+            res.status(404).json({ message: 'No exams scheduled for today' });
+        }
+    } catch (error) {
+        console.error('Error fetching exam schedule:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Route to fetch all exams
 app.get('/getExams', async (req, res) => {
     let connection;
@@ -420,15 +435,42 @@ app.get('/getExams', async (req, res) => {
         // const [rows] = await connection.query('SELECT * FROM Exam_Master where examID=?');
         // const sql = await connection.query('SELECT * FROM Exam_Master WHERE examID=?');
         console.log(req.session.userID);
-        
+
         // Using connection.execute for parameterized query
         const [result] = await connection.execute('SELECT * FROM Exam_Master WHERE teacherId = ?', [req.session.userID]);
-        
+
         // console.log(result);
         // const [result] = await connection.execute(sql, [req.session.examID]);
         res.json({ success: true, exams: result });
         // res.json({ success: true, exams: rows });
-        
+
+        // Return the fetched data as JSON
+        // res.json({ success: true, exams: rows });
+    } catch (error) {
+        console.error('Error fetching exams:', error);
+        res.status(500).json({ success: false, message: 'Error fetching exams.' });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Route to fetch all exams
+app.get('/getStudentExams', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        // const [rows] = await connection.query('SELECT * FROM Exam_Master where examID=?');
+        // const sql = await connection.query('SELECT * FROM Exam_Master WHERE examID=?');
+        console.log(req.session.userID);
+
+        // Using connection.execute for parameterized query
+        const [result] = await connection.execute('SELECT * FROM Exam_Master');
+
+        // console.log(result);
+        // const [result] = await connection.execute(sql, [req.session.examID]);
+        res.json({ success: true, exams: result });
+        // res.json({ success: true, exams: rows });
+
         // Return the fetched data as JSON
         // res.json({ success: true, exams: rows });
     } catch (error) {
@@ -513,11 +555,61 @@ app.post('/addQuestion', async (req, res) => {
     }
 });
 
-//Set Test : SetTest
+//route to handle multiple question at once into the database from teacher_original.html 
+app.post('/addMultipleQuestion', async (req, res) => {
+    const { questions } = req.body; // Extract the questions array from the request body
+    console.log(req.body);
 
+    const examID = req.session.examID; // Assuming examID is stored in session
+    // const examID = 1; // Assuming examID is stored in session
+
+    if (!examID) {
+        return res.status(400).json({ message: 'Exam ID not found in session' });
+    }
+
+    let connection;
+    try {
+        // Get a connection from the pool
+        connection = await pool.getConnection();
+
+        // Prepare the SQL query to insert all questions at once
+        const sql = `
+            INSERT INTO Question_Master (
+                examID, question, question_marks, optionA, optionB, optionC, optionD, answer_key
+            ) VALUES ?
+        `;
+
+        // Prepare the data to be inserted
+        const questionData = questions.map(q => [
+            examID,
+            q.question,  // Question text
+            q.question_marks,
+            q.optionA,   // Option A
+            q.optionB,   // Option B
+            q.optionC,   // Option C
+            q.optionD,   // Option D
+            q.answer_key // Correct option
+        ]);
+
+        // Execute the SQL query to insert all questions
+        const [result] = await connection.query(sql, [questionData]);
+
+        // Send success response
+        res.status(200).json({ message: 'Questions successfully inserted!', receivedData: req.body });
+
+    } catch (error) {
+        console.error('Error inserting questions:', error);
+        res.status(500).json({ message: 'Error processing request' });
+    } finally {
+        if (connection) connection.release(); // Release the connection back to the pool
+    }
+});
+
+//Set Test : SetTest
 app.get('/SetTest', (req, res) => {
     console.log("serving test");
-    const filePath = path.join(__dirname, '../Frontend/HTML/teacherQue.html');
+    // const filePath = path.join(__dirname, '../Frontend/HTML/teacherQue.html');
+    const filePath = path.join(__dirname, '../Frontend/HTML/teacher_original.html');
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error sending file:', err);
@@ -530,11 +622,10 @@ app.get('/SetTest', (req, res) => {
 });
 
 //Exam Creation:
-
 app.post('/addExam', async (req, res) => {
 
     console.log("Adding Exam");
-    const { examName, examDate, examTime, examDuration, totalMarks, passingMarks } = req.body;
+    const { examName, examDate, examTime, examEndTime, totalMarks, passingMarks } = req.body;
 
     let connection;
     console.log("TeacherID:" + req.session.userID);
@@ -542,8 +633,8 @@ app.post('/addExam', async (req, res) => {
         connection = await pool.getConnection();
 
         // Insert into user_master
-        const sql = 'INSERT INTO exam_master(teacherId, name, start_date, start_time, duration, total_marks, passing_marks, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        const [result] = await connection.execute(sql, [req.session.userID, examName, examDate, examTime, examDuration, totalMarks, passingMarks, new Date()]);
+        const sql = 'INSERT INTO exam_master(teacherId, name, start_date, start_time, end_time, total_marks, passing_marks, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await connection.execute(sql, [req.session.userID, examName, examDate, examTime, examEndTime, totalMarks, passingMarks, new Date()]);
 
         // Get the generated examID from the insert result
         const newExamID = result.insertId;
@@ -579,116 +670,70 @@ app.get('/api/exam', async (req, res) => {
     }
 });
 
-// app.post('/submit-exam', (req, res) => {
-//     const { name, duration, questions } = req.body;
+app.post('/api/exams/myexam', async (req, res) => {
+    const { examID } = req.body;
+    const sql = "SELECT * FROM exam_master where examID=? And teacherId=?";
+    const connection = await pool.getConnection();
+    const [result] = await connection.execute(sql, [examID, req.session.userID]);
+    connection.release();
+    console.log(result);
+    res.json(result);
+});
 
-//     // Check if the examData object is valid
-//     if (!name || !duration || !questions) {
-//         return res.status(400).json({ success: false, message: 'Invalid exam data' });
-//     }
+//to Update Exam:
+app.post('/updateExam', async (req, res) => {
+    const { examID, name, exam_start_date, exam_start_time, exam_end_time, total_marks, passing_marks } = req.body;
 
-//     console.log('Received exam data:', name);
+    let connection;
+    console.log("teacherID: " + req.session.userID);
 
-//     // Insert exam into Exam_Master table
-//     console.log("Success");
-//     const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
-//     pool.query(insertExamQuery, [name, duration], (err, result) => {
-//         if (err) {
-//             console.error(err);
-//             return res.status(500).json({ success: false });
-//         }
+    try {
+        // Get the connection asynchronously
+        connection = await pool.getConnection();
 
-//         console.log("Exam inserted successfully");
+        // Prepare the SQL query for updating exam_master
+        const sql = 'UPDATE exam_master SET name = ?, start_date = ?, start_time = ?, end_time = ?, total_marks = ?, passing_marks = ?, timestamp = ? WHERE examID = ? AND teacherId=?';
 
-//         const examId = result.insertId; // Retrieve the examId from the inserted exam
+        // Execute the query and update the data in the database
+        const [result] = await connection.execute(sql, [name, exam_start_date, exam_start_time, exam_end_time, total_marks, passing_marks, new Date(), examID, req.session.userID]);
 
-//         // Insert questions into Question_Master table
-//         const insertQuestionQuery = `
-//             INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) 
-//             VALUES ?`;
+        // Check if any rows were updated
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Exam not found or not authorized to update" });
+        }
 
-//         // Prepare question values, including examId for each question
-//         const questionValues = questions.map((question) => [
-//             // examId,                         // Add examId for each question
-//             question.questionText,          // The actual question text
-//             question.options[0],            // Option A
-//             question.options[1],            // Option B
-//             question.options[2],            // Option C
-//             question.options[3],            // Option D
-//             question.correctOption          // Correct option
-//         ]);
+        console.log("Exam updated successfully, Exam ID: " + examID);
 
-//         // Execute bulk insert for questions
-//         pool.query(insertQuestionQuery, [questionValues], (err, result) => {
-//             if (err) {
-//                 console.error(err);
-//                 return res.status(500).json({ success: false });
-//             }
-//             console.log("Success");
+        // Respond with success (you can modify this based on your application's needs)
+        res.json({
+            success: true,
+            message: "Exam updated successfully",
+            examID: examID
+        });
 
-//             res.json({ success: true });
-//         });
-//     });
-// });
+    } catch (error) {
+        console.error("Error updating exam data:", error);
+        res.status(500).json({ success: false, message: "Error updating exam" });
+    } finally {
+        if (connection) {
+            connection.release(); // Make sure to release the connection
+        }
+    }
 
+});
 
-// Endpoint to handle exam submission
-// app.post('/submit-exam', (req, res) => {
-//     const { name, duration, questions } = req.body;
-
-//     // Check if the examData object is valid
-//     if (!name || !duration || !questions) {
-//         return res.status(400).json({ success: false, message: 'Invalid exam data' });
-//     }
-
-//     console.log('Received exam data:', name);
-
-//     // Insert exam into Exam_Master table
-//     const insertExamQuery = 'INSERT INTO Exam_Master (name, duration) VALUES (?, ?)';
-//     pool.query(insertExamQuery, [name, duration], (err, result) => {
-//         if (err) {
-//             console.error(err);
-//             return res.status(500).json({ success: false });
-//         }
-
-//         console.log("Success");
-//     });
-
-//     // const examId = result.insertId;
-
-//     // Insert questions into Question_Master table
-//     // const insertQuestionQuery = `INSERT INTO Question_Master (exam_id, question_text, option_1, option_2, option_3, option_4, correct_option) VALUES ?`;
-//     const insertQuestionQuery = `INSERT INTO Question_Master (question, optionA, optionB, optionC, optionD, answer_key) VALUES ?`;
-//     const questionValues = questions.map((question) => [
-//         // examId,
-//         question.questionText,
-//         question.options[0],
-//         question.options[1],
-//         question.options[2],
-//         question.options[3],
-//         question.correctOption
-//     ]);
-
-//     // Create a query with placeholders for multiple rows
-//     const valuesPlaceholders = questionValues.map(() => '(?, ?, ?, ?, ?, ?, ?)').join(', ');
-
-//     // Final query
-//     insertQuestionQuery += valuesPlaceholders;
-
-//     // Flatten the array of values
-//     const flattenedValues = questionValues.flat();
-
-//     console.log(pool.format(insertQuestionQuery, flattenedValues));
-
-//     pool.query(insertQuestionQuery, flattenedValues, (err, result) => {
-//         if (err) {
-//             console.error(err);
-//             return res.status(500).json({ success: false });
-//         }
-
-//         res.json({ success: true });
-//     });
-// });
+//Delete an Exam
+app.post('/delExam', async (req, res) => {
+    const { examID } = req.body;
+    const sql = "DELETE FROM question_master WHERE examID=?";
+    const connection = await pool.getConnection();
+    const [result1] = await connection.execute(sql, [examID]);
+    const sql1 = "DELETE FROM exam_master WHERE examID=?";
+    const [result2] = await connection.execute(sql1, [examID]);
+    connection.release();
+    res.status(200).json({ redirectURL: "/teacherExamDisplay.html", receivedData: req.body });
+    // res.status(200).json({ redirectURL: "/api/exam", receivedData: req.body });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);

@@ -78,10 +78,17 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 60%; /* Make it responsive */
-    max-width: 800px; /* Limit maximum width */
+    width: 50%;
+    /* Make it responsive */
+    max-width: 800px;
+    /* Limit maximum width */
+    margin: 20px 0px 20px 25px;
     /* margin-top: 10px;
     margin-bottom: 10px; */
+}
+
+.main-content:hover {
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
 }
 
 /* styles.css */
@@ -115,12 +122,14 @@ body {
 }
 
 .card:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); */
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
 }
 
 .user-info-card h2 {
     text-align: center;
-    color: #333;
+    /* color: #333; */
+    color: #1c2e92;
     margin-bottom: 20px;
     font-size: 24px;
     font-weight: 600;
@@ -167,24 +176,30 @@ body {
     flex-direction: column;
 }
 
-
 .notice-board {
-    width: 45%;
+    width: 50%;
     background: #fff;
     color: #333;
     padding: 10px;
-    margin-left: 15px;
     /* margin-top: -342px; */
+    /* margin-left: 15px;
     margin-top: 10px;
     margin-bottom: 10px;
-    margin-right: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-right: 15px; */
+    margin: 20px 25px 20px 25px;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
     border-radius: 8px;
 }
 
+.notice-board:hover {
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
+}
+
 .notice-board h2 {
-    font-size: 20px;
+    text-align: center;
+    font-size: 25px;
     margin-bottom: 15px;
+    color: #1c2e92;
 }
 
 .notice-board .notice {
@@ -212,4 +227,121 @@ body {
 
 .alert.show {
     display: block;
+}
+
+.today-events {
+    color: #000000;
+    width: 80%;
+    /* Full width */
+    padding: 15px;
+    /* Maintain padding */
+    background-color: #f4efef;
+    /* Background color */
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    /* Border for styling */
+    margin-top: 10px;
+    /* Space above this section */
+    border-radius: 10px;
+    /* margin-left: 10%; */
+}
+
+.today-events:hover {
+    background: #ededed;
+    /* margin-left: 0; */
+    width: 100%;
+    transition: background-color 0.5s ease, width 0.5s ease;
+    /* transition: background-color 0.5s ease, width 0.5s ease, margin-left 0.3 ease; */
+}
+
+.notice-btn {
+    background: linear-gradient(to right, #9884f4, #585de4);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.notice-btn:hover {
+    background: linear-gradient(to right, #8678bd, #4d50b0);
+    box-shadow: 0px 0px 8px 5px rgba(44, 92, 158, 0.36);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Darker background */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 30px;
+    border: 1px solid #ccc;
+    width: 80%;
+    /* Could be more or less, depending on screen size */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.submit-notice-button {
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(to right, #9884f4, #585de4);
+    /* Bootstrap success color */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.notice {
+    color: #007bff;
+}
+
+/* #noticesContainer {
+    color: red;
+    box-shadow: #000;
+} */
+
+.submit-notice-button:hover {
+    background: linear-gradient(to right, #8678bd, #4d50b0);
+    box-shadow: 0px 0px 8px 5px rgba(44, 92, 158, 0.36);
 }

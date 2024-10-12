@@ -219,11 +219,34 @@
                 return;
             }
 
+            if (!question_marks) {
+                alert("Please enter marks for this question");
+                return;
+            }
+
             const options = [];
             let crc = 0;
             for (let i = 1; i <= 4; i++) {
                 const optionText = document.getElementById(`option-${i}`).value;
-                const isCorrect = document.querySelector(`input[name="answer"]:checked`)?.value === `option-${i}`;
+
+                // Check if option text is empty
+                if (!optionText) {
+                    alert("Enter all options!");
+                    return;
+                }
+
+                // Get the selected radio button
+                const selectedOption = document.querySelector('input[name="answer"]:checked');
+
+                // Check if a correct option is chosen
+                if (!selectedOption) {
+                    alert("Choose a correct option!");
+                    return;
+                }
+
+                // Compare selected option value with the current option
+                const isCorrect = selectedOption.value === `option-${i}`;
+
                 options.push({ text: optionText, isCorrect: isCorrect });
                 if (isCorrect) {
                     crc = i;
@@ -325,9 +348,16 @@
             //     duration: examDuration,
             // });
 
-            alert("Test has been successfully set.");
+            if (questionCount === 1) {
+                alert("Add at least one question!");
+            }
+            else {
+                alert("Test has been successfully set.");
 
-            window.location.href = '/generattest';
+                window.location.href = '/teacherExamDisplay.html';
+            }
+
+            // window.location.href = '/generattest';
             // document.getElementById("exam-preview").classList.remove("hidden");
             // document.getElementById("preview-exam-name").innerText = "Exam: " + examName;
             // document.getElementById("exam-time-display").innerText = "Duration: " + examDuration + " minutes";

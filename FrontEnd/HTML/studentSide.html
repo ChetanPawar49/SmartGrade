@@ -15,8 +15,8 @@
         </div>
 
         <div class="nav-menu">
-            <a href="#">Dashboard</a>
-            <a href="#">Exam</a>
+            <a href="#" id="Dashboard">Dashboard</a>
+            <a href="#" id="Exam">Exam</a>
             <a href="#">Result</a>
             <a href="#" onclick="logout()">Logout</a>
         </div>
@@ -32,6 +32,13 @@
     <div id="alert" class="alert">You have been logged out successfully.</div>
     
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('Dashboard').addEventListener('click', () => Screenchange('studentDash.html'));
+            document.getElementById('Exam').addEventListener('click', () => Screenchange('studentExamDisplay.html'));
+            // document.getElementById('Exam').addEventListener('click', () => Screenchange('upcomingExam.html'));
+            // document.getElementById('Setexam').addEventListener('click', () => Screenchange('setExam.html'));
+        });
+
         function logout() {
             if(confirm("Logging Out?")) {
                 document.getElementById('alert').classList.add('show');
@@ -61,6 +68,14 @@
                     // Optionally handle logout errors here
                 });
             }
+        }
+
+        // Function to change the right frame's content
+        function Screenchange(content) {
+            // Alert to confirm function call (remove after debugging)
+            //alert("Changing frame content to: " + content);
+            // Change the right frame's source to the specified content
+            parent.frames['right'].location.href = content;
         }
     </script>
 </body>

@@ -5,7 +5,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam List Form</title>
-    <link rel="stylesheet" href="/CSS/teacherExam.css">
+    <!-- <link rel="stylesheet" href="/CSS/teacherExam.css"> -->
+    <style>
+        /* General form styling */
+        #examForm {
+            width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            /* background-color: #f9f9f9; */
+            background: linear-gradient(to right, #777bf1, #9884f4);
+            box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
+            font-family: Arial, sans-serif;
+            margin-top: 35px;
+        }
+
+        #examForm h2 {
+            text-align: center;
+            /* color: #5746a1; */
+            color: #4e3aa8;
+            font-weight: bolder;
+        }
+
+        .examh h2 {
+            text-align: center;
+            /* color: #5746a1; */
+            color: #4e3aa8;
+            font-weight: bolder;
+            padding: 8px;
+            margin: 15px;
+            background-color: #9884f4;
+        }
+
+        /* Form labels and inputs */
+        #examForm label {
+            font-size: 16px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        #examForm input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Button container */
+        .button-container {
+            text-align: center;
+        }
+
+        .create-questions-btn {
+            /* background-color: #4CAF50; */
+            background-color: #4348cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .create-questions-btn:hover {
+            /* background-color: #45a049; */
+            background-color: #3016a7;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 500px) {
+            #examForm {
+                width: 90%;
+            }
+
+            #examForm input {
+                padding: 10px;
+            }
+
+            .create-questions-btn {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+
+        .exam-card {
+            background-color: #fff;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .exam-card h3 {
+            color: #5746a1;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .exam-details {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .exam-details div {
+            flex: 1 1 200px;
+            margin-bottom: 10px;
+        }
+
+        .exam-details div span {
+            font-weight: bold;
+            display: block;
+            color: #666;
+        }
+
+        .edit-btn {
+            /* background-color: #007bff; */
+            background: linear-gradient(to right, #9884f4, #585de4);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-left: 45%;
+        }
+
+        .edit-btn:hover {
+            /* background-color: #0056b3; */
+            background: linear-gradient(to right, #5b4d96, #2c2f82);
+        }
+    </style>
 </head>
 
 <body>
@@ -22,49 +160,6 @@
         </div> -->
     </div>
 
-    <!-- Model for Editing Exam -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <div class="title">Edit Exam</div>
-            <div class="content">
-                <form id="edit-exam-form">
-                    <div class="user-details">
-                        <div class="input-box">
-                            <span class="details">Exam Title</span>
-                            <input type="text" id="edit_name" name="name" maxlength="15" required>
-                        </div>
-                        <div class="input-box">
-                            <span class="details">Exam Start Date</span>
-                            <input type="date" id="edit_start_date" name="start_date" required>
-                        </div>
-                        <div class="input-box">
-                            <span class="details">Exam Start Time</span>
-                            <input type="time" id="edit_start_time" name="start_time" required>
-                        </div>
-                        <div class="input-box">
-                            <span class="details">Exam End Time</span>
-                            <input type="time" id="edit_end_time" name="end_time" required>
-                        </div>
-                        <!-- <div class="input-box">
-                            <span class="details">Exam Duration</span>
-                            <input type="number" id="edit_duration" name="duration" required>
-                        </div> -->
-                        <div class="input-box">
-                            <span class="details">Total Marks</span>
-                            <input type="number" id="edit_total_marks" name="total_marks" required>
-                        </div>
-                        <div class="input-box">
-                            <span class="details">Passing Marks</span>
-                            <input type="number" id="edit_passing_marks" name="passing_marks" required>
-                        </div>
-                    </div>
-                    <input id="edit_submit" type="submit" value="Save Changes">
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             fetchExams();
@@ -73,7 +168,7 @@
         // Function to fetch exams from the backend and populate the form
         async function fetchExams() {
             try {
-                const response = await fetch('/getExams', {
+                const response = await fetch('/getStudentExams', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -123,8 +218,7 @@
                                     <div><span>Passing Marks:</span> ${exam.passing_marks}</div>
                                 </div>
 
-                                <button class="edit-btn" data-exam-id="${exam.examID}">Edit Exam</button>
-                                <button class="edit-btn" myevent="Delete" data-exam-id="${exam.examID}">Delete Exam</button>
+                                <button class="edit-btn" myevent="Take" data-exam-id="${exam.examID}">Take Exam</button>
                             </div>
                         `;
 
@@ -152,10 +246,8 @@
         function handleEditClick(event) {
             const examID = this.getAttribute('data-exam-id');
             const myevent = this.getAttribute('myevent');
-            if (myevent === "Delete") {
-                deleteExam(examID);
-            } else {
-                updateExam(examID);
+            if (myevent === "Take") {
+                takeExam(examID);
             }
             //alert(`Editing exam with ID: ${examID} and status: ${status}`);
             // Implement your logic to handle the edit action here (e.g., sending data to the server)
@@ -184,7 +276,7 @@
                     console.log("Console Logging ::  " + exam.name);
                     document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
                     document.getElementById('edit_start_time').value = exam.start_time || '';
-                    document.getElementById('edit_end_time').value = exam.end_time || '';
+                    document.getElementById('edit_duration').value = exam.duration || '';
                     document.getElementById('edit_total_marks').value = exam.total_marks || '';
                     document.getElementById('edit_passing_marks').value = exam.passing_marks || '';
 
@@ -195,76 +287,6 @@
                 .catch(error => console.error('Error fetching exam details:', error));
         }
 
-        // Close modal when clicking on <span> (x)
-        document.getElementById('closeModal').onclick = function () {
-            document.getElementById('editModal').style.display = "none";
-        }
-
-        // Close modal when clicking anywhere outside of the modal
-        window.onclick = function (event) {
-            if (event.target === document.getElementById('editModal')) {
-                document.getElementById('editModal').style.display = "none";
-            }
-        }
-
-        // Handle the form submission to save changes
-        document.getElementById('edit-exam-form').onsubmit = function (event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const examID = document.querySelector('.edit-btn[data-exam-id]').getAttribute('data-exam-id'); // Get the exam ID from the button
-            const updatedData = {
-                examID: examID,
-                name: document.getElementById('edit_name').value,
-                exam_start_date: document.getElementById('edit_start_date').value,
-                exam_start_time: document.getElementById('edit_start_time').value,
-                exam_end_time: document.getElementById('edit_end_time').value,
-                total_marks: document.getElementById('edit_total_marks').value,
-                passing_marks: document.getElementById('edit_passing_marks').value,
-            };
-
-            fetch('/updateExam', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedData),
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Exam updated successfully!');
-                        location.reload();
-                    } else {
-                        alert('Error updating exam!');
-                    }
-                })
-                .catch(error => console.error('Error updating exam:', error));
-        }
-
-        async function deleteExam(examID) {
-            const name = document.getElementById(`namee_${examID}`).textContent;
-            <!-- alert(`Are You Sure You Want to Delete Exam \nID: ${examID} \n${name}`); -->
-            const input = confirm(`Are You Sure You Want to Delete Exam \nID: ${examID} \n${name}`);
-            const data = { examID: examID };
-            if(input)
-            {
-                const response = await fetch('/delExam', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-    
-                const mydata = await response.json();
-                if (response.ok) {
-                    alert('Delete successful!');
-                    // Redirect or clear the form as needed
-                    window.location.href = mydata.redirectURL;
-                } else {
-                    alert('Delete failed: ' + mydata.message);
-                }
-            }
-        }
     </script>
 </body>
 

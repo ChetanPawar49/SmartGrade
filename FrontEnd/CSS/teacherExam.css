@@ -1,20 +1,32 @@
 /* General form styling */
 #examForm {
-    width: 400px;
+    width: 800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
     border: 1px solid #ccc;
     border-radius: 8px;
     /* background-color: #f9f9f9; */
     background: linear-gradient(to right, #777bf1, #9884f4);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
     font-family: Arial, sans-serif;
+    margin-top: 35px;
 }
 
 #examForm h2 {
     text-align: center;
-    color: #5746a1;
-    margin-bottom: 20px;
+    /* color: #5746a1; */
+    color: #4e3aa8;
+    font-weight: bolder;
+}
+
+.examh h2 {
+    text-align: center;
+    /* color: #5746a1; */
+    color: #4e3aa8;
+    font-weight: bolder;
+    padding: 8px;
+    margin: 15px;
+    background-color: #9884f4;
 }
 
 /* Form labels and inputs */
@@ -72,4 +84,94 @@
         width: 100%;
         padding: 12px;
     }
+}
+
+.exam-card {
+    background-color: #fff;
+    padding: 20px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.exam-card h3 {
+    color: #5746a1;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.exam-details {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.exam-details div {
+    flex: 1 1 200px;
+    margin-bottom: 10px;
+}
+
+.exam-details div span {
+    font-weight: bold;
+    display: block;
+    color: #666;
+}
+
+.edit-btn {
+    /* background-color: #007bff; */
+    background: linear-gradient(to right, #9884f4, #585de4);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+}
+
+.edit-btn:hover {
+    /* background-color: #0056b3; */
+    background: linear-gradient(to right, #5b4d96, #2c2f82);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    /* Could be more or less, depending on screen size */
+    max-width: 600px;
+    border-radius: 8px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
