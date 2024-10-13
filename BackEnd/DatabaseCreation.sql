@@ -80,14 +80,19 @@ CREATE TABLE `Question_Master` (
 );
 
 CREATE TABLE `Attempt_Master` (
-  `attemptID` int UNIQUE PRIMARY KEY NOT NULL,
+  `attemptID` int UNIQUE NOT NULL AUTO_INCREMENT,
   `examID` int NOT NULL,
   `questionID` int NOT NULL,
   `applicationID` int NOT NULL,
   `selected_option` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
-  `correct_option` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
-  `marks_obt` int NOT NULL,
-  `timestamp` timestamp NOT NULL
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (examID, questionID, applicationID)
+);
+
+CREATE TABLE notices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    notice_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE `Teacher` ADD FOREIGN KEY (`userID`) REFERENCES `User_Master` (`userID`);
@@ -100,19 +105,27 @@ ALTER TABLE `Question_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Student` (`examID`);
 
+ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
+
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question_Master` (`questionID`);
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
 
+ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `User_Master` (`userID`);
+
 SELECT * FROM user_master;
 SELECT * FROM question_master;
 SELECT * FROM exam_master;
+select * from Attempt_Master;
+select * from notices;
 
 drop table exam_master;
 drop table question_master;
+drop table Attempt_Master;
 
 truncate question_master;
 truncate exam_master;
+truncate notices;
 
 alter table question_master drop timestamp;
 
