@@ -414,7 +414,7 @@ app.post('/logout', (req, res) => {
 
 app.get('/exam-schedule', checkAuth, async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT examID, name, start_date, start_time, duration, total_marks, passing_marks FROM exam_master WHERE start_date = CURDATE()');
+        const [rows] = await pool.query('SELECT examID, name, start_date, start_time, end_time, total_marks, passing_marks FROM exam_master WHERE start_date = CURDATE()');
 
         if (rows.length > 0) {
             res.json(rows); // Send today's exam data as JSON
@@ -555,7 +555,7 @@ app.post('/addQuestion', async (req, res) => {
     }
 });
 
-//route to handle multiple question at once into the database from teacher_original.html 
+//route to handle multiple question at once into the database from teacherQue.html 
 app.post('/addMultipleQuestion', async (req, res) => {
     const { questions } = req.body; // Extract the questions array from the request body
     console.log(req.body);
@@ -609,7 +609,7 @@ app.post('/addMultipleQuestion', async (req, res) => {
 app.get('/SetTest', (req, res) => {
     console.log("serving test");
     // const filePath = path.join(__dirname, '../Frontend/HTML/teacherQue.html');
-    const filePath = path.join(__dirname, '../Frontend/HTML/teacher_original.html');
+    const filePath = path.join(__dirname, '../Frontend/HTML/teacherQue.html');
     res.sendFile(filePath, (err) => {
         if (err) {
             console.error('Error sending file:', err);
@@ -733,6 +733,169 @@ app.post('/delExam', async (req, res) => {
     connection.release();
     res.status(200).json({ redirectURL: "/teacherExamDisplay.html", receivedData: req.body });
     // res.status(200).json({ redirectURL: "/api/exam", receivedData: req.body });
+});
+
+// Start Exam
+app.get('/start_exam', (req, res) => {
+    const { examID } = req.query;
+    req.session.testExamID = examID;
+    console.log("serving home with examID:", req.session.testExamID);
+    const filePath = path.join(__dirname, '../Frontend/HTML/takeExam.html');
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(err.status || 500).send('Error sending file');
+        } else {
+            console.log('File sent:', filePath);
+        }
+    });
+});
+
+app.post('/get-questions', async (req, res) => {
+    const examId = req.session.testExamID; // examId comes from URL params
+    let connection;
+
+    // Modified query to fetch questions and their corresponding options from question_master
+    const query = `
+      SELECT questionID, question, optionA, optionB, optionC, optionD
+      FROM question_master
+      WHERE examID = ?;
+    `;
+
+    try {
+        // Fetch questions and options from the database
+        connection = await pool.getConnection();
+
+        const [results] = await connection.query(query, [examId]);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No questions found for this exam.' });
+        }
+        console.log(results);
+
+        // Format the questions and options into an array
+        const questionsArray = results.map(row => ({
+            id: row.questionID, // Add questionID to the object
+            question: row.question,
+            options: [row.optionA, row.optionB, row.optionC, row.optionD]
+        }));
+
+        // Send the formatted questions array back to the frontend
+        res.json({ examId, questions: questionsArray });
+    } catch (err) {
+        console.error('Error fetching questions:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
+});
+
+//Insert Into Attempts:
+app.post('/InsertAttempt', async (req, res) => {
+    const { questionId, sel_answer } = req.body;
+    const examId = req.session.testExamID; // examId comes from URL params
+    let connection;
+
+    const sql = 'Select * from Attempt_Master where examID=? and questionID=? and applicationID=?';
+    // Modified query to fetch questions and their corresponding options from question_master
+    const query = `INSERT INTO Attempt_Master (examID, questionID, applicationID, selected_option) VALUES(?,?,?,?)`;
+    const updateQuery = 'UPDATE Attempt_Master SET selected_option = ? WHERE examID = ? AND questionID = ? AND applicationID = ?';
+    try {
+        // Fetch questions and options from the database
+        connection = await pool.getConnection();
+        const [result1] = await connection.query(sql, [examId, questionId, req.session.userID]);
+        if (result1.length > 0) {
+            const [results] = await connection.query(updateQuery, [sel_answer, examId, questionId, req.session.userID]);
+            console.log(results);
+            return res.status(200).json({ message: 'Attempted' });
+        } else {
+            const [results] = await connection.query(query, [examId, questionId, req.session.userID, sel_answer]);
+            console.log(results);
+            return res.status(200).json({ message: 'Attempted' });
+        }
+    } catch (err) {
+        console.error('Error fetching questions:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
+});
+
+// Route to add notice
+app.post('/add-notice', async (req, res) => {
+    const notice = req.body.notice;
+    let connection;
+
+    if (!notice) {
+        return res.status(400).json({ success: false, message: 'Notice text is required' });
+    }
+
+    const query = 'INSERT INTO notices (notice_text) VALUES (?)';
+
+    try {
+        // Acquire a connection from the pool
+        connection = await pool.getConnection();
+
+        // Execute the query using a promise-based approach
+        await connection.query(query, [notice]);
+
+        // Send success response
+        res.json({ success: true, message: 'Notice added successfully' });
+    } catch (err) {
+        console.error('Error inserting notice:', err);
+        res.status(500).json({ success: false, message: 'Error inserting notice' });
+    } finally {
+        // Release the connection back to the pool
+        if (connection) connection.release();
+    }
+});
+
+// Route to get all notices
+app.get('/notices', async (req, res) => {
+    let connection;
+
+    try {
+        // Acquire a connection from the pool
+        connection = await pool.getConnection();
+
+        const query = 'SELECT * FROM notices ORDER BY created_at DESC';
+
+        // Use a promise-based approach to handle the query
+        const [results] = await connection.query(query);
+
+        // Send back the results
+        res.json({ success: true, notices: results });
+    } catch (err) {
+        console.error('Error fetching notices:', err);
+        res.status(500).json({ success: false, message: 'Error fetching notices' });
+    } finally {
+        // Release the connection back to the pool
+        if (connection) connection.release();
+    }
+});
+
+// Route to delete a notice from database
+app.delete('/delete-notice/:id', async (req, res) => {
+    const noticeId = req.params.id;
+    let connection;
+
+    const query = 'DELETE FROM notices WHERE id = ?';
+
+    try {
+        connection = await pool.getConnection();
+        const result = await connection.query(query, [noticeId]);
+
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: 'Notice deleted successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'Notice not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting notice:', err);
+        res.status(500).json({ success: false, message: 'Error deleting notice' });
+    } finally {
+        if (connection) connection.release();
+    }
 });
 
 app.listen(PORT, () => {

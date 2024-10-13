@@ -5,15 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP System - User Interface</title>
-    <!-- <link rel="stylesheet" href="/FrontEnd/CSS/styles.css"> -->
     <link rel="stylesheet" href="/css/studentInterface.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
     <div class="main-content">
-        <!-- Main content goes here -->
-        <!-- <h3>Applicant Details</h3> -->
         <div class="dashboard">
             <div class="card user-info-card">
                 <h2>User Profile</h2>
@@ -67,26 +64,30 @@
 
     <div class="notice-board" id="noticeBoard">
         <h2>Notice Board</h2>
+        <button class="notice-btn" id="addNoticeBtn">Add Notice</button>
         <div class="notice">
-            <!-- <h3>Notice 1</h3> -->
             <p>
-                <marquee onMouseOver="this.stop()" onMouseOut="this.start()">Upcoming exam schedule for the semester.
-                    Please check the exam portal for details.</marquee>
+                <b>
+                    <marquee onMouseOver="this.stop()" onMouseOut="this.start()">Upcoming exam schedule for the
+                        semester. Please check the exam portal for details.</marquee>
+                </b>
             </p>
         </div>
+    </div>
 
-        <div class="today-events">
-            <h2>Today's Events</h2>
-            <div id="events-list">
-                <!-- This will be populated by JavaScript -->
-            </div>
+    <!-- Modal for adding notice -->
+    <div id="addNoticeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Add Notice</h2>
+            <textarea id="noticeText" rows="5" style="width: 100%;"></textarea>
+            <br>
+            <button class="submit-notice-button" id="submitNotice">Submit Notice</button>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            //start
-            <!-- fetch('/profile') -->
             fetch('/user-info')
                 .then(response => {
                     if (response.status === 401) { // Unauthorized
@@ -99,7 +100,6 @@
                 })
                 .then(data => {
                     if (data.username) {
-                        console.log(data.username);
                         document.getElementById('username').textContent = data.username || "chetan";
                         document.getElementById('first-name').textContent = data.firstname;
                         document.getElementById('last-name').textContent = data.lastname;
@@ -111,72 +111,56 @@
                     }
                 })
                 .catch(error => console.error('Error fetching profile:', error));
-            //end
 
-            // Fetch all notices when page loads
-            fetch('/notices')
-                .then(response => response.json())
-                .then(data => {
-                    const noticeBoard = document.getElementById("noticeBoard");
-                    data.notices.forEach(notice => {
-                        const noticeText = document.createElement("div");
-                        noticeText.classList.add("notice");
-                        noticeText.innerHTML = `
-                            <p>
-                                <b>
-                                    <marquee onMouseOver="this.stop()" onMouseOut="this.start()">${notice.notice_text}</marquee>
-                                </b>
-                            </p>
-                        `;
-                        noticeBoard.appendChild(noticeText);
-                    });
-                })
-                .catch(error => console.error('Error fetching notices:', error));
+            // Modal functionality
+            const modal = document.getElementById("addNoticeModal");
+            const btn = document.getElementById("addNoticeBtn");
+            const span = document.getElementById("closeModal");
+            const submitNotice = document.getElementById("submitNotice");
+            const noticesContainer = document.getElementById("noticesContainer");
+            const noticeBoard = document.getElementById("noticeBoard");
 
-            // Fetch today's exam schedule
-            fetch('/exam-schedule')
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to fetch exam schedule');
-                    }
-                })
-                .then(examData => {
-                    // Assume examData is an array of exam objects
-                    const todayEventsContainer = document.querySelector('.today-events');
+            // Handle submitting notice
+            submitNotice.onclick = function () {
+                const notice = document.getElementById("noticeText").value;
+                const noticeText = document.createElement("div");
+                noticeText.classList.add("notice");
 
-                    // Clear any existing events (if necessary)
-                    todayEventsContainer.innerHTML = '<h2>Today\'s Events</h2>';
+                if (notice.trim()) {
+                    noticeText.innerHTML = `
+                    <p>
+                        <b>
+                            <marquee onMouseOver="this.stop()" onMouseOut="this.start()">${notice}.</marquee>
+                        </b>
+                    </p>
+                    `
+                    
+                    noticeBoard.appendChild(noticeText);
+                    
+                    // Clear the textarea and close the modal
+                    document.getElementById("noticeText").value = '';
+                    modal.style.display = "none"; // Close modal after submission
+                } else {
+                    alert('Please enter a notice before submitting.');
+                }
+            }
 
-                    if (examData.length > 0) {
-                        examData.forEach(exam => {
-                            // Date and Time Format
-                            const date = exam.start_date.split('T')[0];
-                            let time = exam.start_time;
-                            let [hours, minutes] = time.split(':'); // Split the time string into hours and minutes
-                            hours = parseInt(hours); // Convert the hours to an integer
-                            const ampm = hours >= 12 ? 'PM' : 'AM';
-                            hours = hours % 12 || 12; // Convert to 12-hour format
+            // Show modal on button click
+            btn.onclick = function () {
+                modal.style.display = "block"; // Show modal
+            }
 
-                            // Create the event HTML
-                            const eventHTML = `
-                            
-                                <div class="event">
-                                    <span class="event-date">${date}</span>
-                                    <div class="event-details">${exam.name} Exam at ${hours}:${minutes} ${ampm} with Total Marks ${exam.total_marks}</div>
-                                </div>
-                            `;
-                            // Append the event to the today's events container
-                            todayEventsContainer.innerHTML += eventHTML;
-                        });
-                    } else {
-                        // If no exams are scheduled today, show a default message
-                        todayEventsContainer.innerHTML += '<p>No events for today.</p>';
-                    }
-                })
-                .catch(error => console.error('Error fetching exam schedule:', error));
+            // Close modal when user clicks on <span> (x)
+            span.onclick = function () {
+                modal.style.display = "none"; // Close modal
+            }
 
+            // Close modal if user clicks outside of it
+            window.onclick = function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none"; // Close modal if user clicks outside of it
+                }
+            }
         });
     </script>
 </body>

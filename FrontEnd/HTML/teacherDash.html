@@ -70,6 +70,7 @@
                 <b>
                     <marquee onMouseOver="this.stop()" onMouseOut="this.start()">Upcoming exam schedule for the
                         semester. Please check the exam portal for details.</marquee>
+                    <i class="fas fa-trash-alt delete-icon" data-id="${notice.id}"></i>
                 </b>
             </p>
         </div>
@@ -112,6 +113,36 @@
                 })
                 .catch(error => console.error('Error fetching profile:', error));
 
+            // Fetch all notices when page loads
+            fetch('/notices')
+                .then(response => response.json())
+                .then(data => {
+                    const noticeBoard = document.getElementById("noticeBoard");
+                    data.notices.forEach(notice => {
+                        const noticeText = document.createElement("div");
+                        noticeText.classList.add("notice");
+                        noticeText.innerHTML = `
+                            <p>
+                                <b>
+                                    <marquee onMouseOver="this.stop()" onMouseOut="this.start()">${notice.notice_text}</marquee>
+                                    <i class="fas fa-trash-alt delete-icon" data-id="${notice.id}"></i>
+                                </b>
+                            </p>
+                        `;
+                        noticeBoard.appendChild(noticeText);
+                    });
+
+                    // Add delete functionality to each icon
+                    document.querySelectorAll('.delete-icon').forEach(icon => {
+                        icon.addEventListener('click', function () {
+                            const noticeId = this.getAttribute('data-id');
+                            console.log(noticeId);
+                            deleteNotice(noticeId, this);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching notices:', error));
+
             // Modal functionality
             const modal = document.getElementById("addNoticeModal");
             const btn = document.getElementById("addNoticeBtn");
@@ -123,27 +154,78 @@
             // Handle submitting notice
             submitNotice.onclick = function () {
                 const notice = document.getElementById("noticeText").value;
-                const noticeText = document.createElement("div");
-                noticeText.classList.add("notice");
-
                 if (notice.trim()) {
-                    noticeText.innerHTML = `
-                    <p>
-                        <b>
-                            <marquee onMouseOver="this.stop()" onMouseOut="this.start()">${notice}.</marquee>
-                        </b>
-                    </p>
-                    `
-                    
-                    noticeBoard.appendChild(noticeText);
-                    
-                    // Clear the textarea and close the modal
-                    document.getElementById("noticeText").value = '';
-                    modal.style.display = "none"; // Close modal after submission
+                    fetch('/add-notice', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ notice })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const noticeText = document.createElement("div");
+                                noticeText.classList.add("notice");
+                                noticeText.innerHTML = `
+                                    <p>
+                                        <b>
+                                            <marquee onMouseOver="this.stop()" onMouseOut="this.start()">${notice}.</marquee>
+                                            <i class="fas fa-trash-alt delete-icon" data-id="${notice.id}"></i>
+                                        </b>
+                                    </p>
+                                `;
+
+                                document.getElementById("noticeBoard").appendChild(noticeText);
+                                document.getElementById("noticeText").value = '';
+                                modal.style.display = "none";
+
+                                // Add delete functionality to each icon
+                                document.querySelectorAll('.delete-icon').forEach(icon => {
+                                    icon.addEventListener('click', function () {
+                                        const noticeId = this.getAttribute('data-id');
+                                        console.log(noticeId);
+                                        deleteNotice(noticeId, this);
+                                    });
+                                });
+                            } else {
+                                alert('Error submitting notice.');
+                            }
+                        })
+                        .catch(error => console.error('Error adding notice:', error));
                 } else {
                     alert('Please enter a notice before submitting.');
                 }
             }
+
+            function deleteNotice(noticeId, element) {
+                fetch(`/delete-notice/${noticeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete the notice');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Remove the notice from the UI
+                        element.parentElement.parentElement.remove(); // This removes the <div> containing the notice
+                    } else {
+                        alert('Error deleting notice: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting notice:', error);
+                    // alert('Error deleting notice');
+                });
+            }
+            
+            
 
             // Show modal on button click
             btn.onclick = function () {

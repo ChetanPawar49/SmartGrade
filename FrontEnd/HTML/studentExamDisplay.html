@@ -143,6 +143,12 @@
             /* background-color: #0056b3; */
             background: linear-gradient(to right, #5b4d96, #2c2f82);
         }
+
+        /* Disabled button styles */
+        .edit-btn:disabled {
+            background: #d3d3d3 !important; /* Use 'background' instead of 'background-color' */
+            cursor: not-allowed; /* Change cursor to indicate disabled */
+        }
     </style>
 </head>
 
@@ -161,6 +167,8 @@
     </div>
 
     <script>
+        let examData = []; // Declare data variable in a higher scope
+
         document.addEventListener('DOMContentLoaded', function () {
             fetchExams();
         });
@@ -183,6 +191,7 @@
                 console.log(data);
 
                 if (data.success) {
+                    examData = data.exams; // Assign fetched data to the data variable
                     const examListContainer = document.getElementById('examListContainer');
                     data.exams.forEach(exam => {
                         const examDiv = document.createElement('div');
@@ -192,16 +201,16 @@
                         const date = exam.start_date.split('T')[0];
                         let startTime = exam.start_time;
                         let endTime = exam.end_time;
-                        
+
                         let [hours1, minutes1] = startTime.split(':'); // Split the time string into hours and minutes
                         let [hours2, minutes2] = endTime.split(':'); // Split the time string into hours and minutes
-                        
+
                         hours1 = parseInt(hours1); // Convert the hours to an integer
                         hours2 = parseInt(hours2); // Convert the hours to an integer
-                        
+
                         const ampm1 = hours1 >= 12 ? 'PM' : 'AM';
                         const ampm2 = hours2 >= 12 ? 'PM' : 'AM';
-                        
+
                         hours1 = hours1 % 12 || 12; // Convert to 12-hour format
                         hours2 = hours2 % 12 || 12; // Convert to 12-hour format
 
@@ -218,22 +227,26 @@
                                     <div><span>Passing Marks:</span> ${exam.passing_marks}</div>
                                 </div>
 
-                                <button class="edit-btn" myevent="Take" data-exam-id="${exam.examID}">Take Exam</button>
+                                <button class="edit-btn" myevent="Take" id="takeTest_${exam.examID}" data-exam-id="${exam.examID}" disabled>Take Exam</button>
                             </div>
                         `;
-
+                        
                         examListContainer.appendChild(examDiv);
 
+                        // Function to check if the "Take Test" button should be enabled
+                        const examStart = new Date(`${exam.start_date}T${exam.start_time}`);
+                        const examEnd = new Date(`${exam.start_date}T${exam.end_time}`);
+                        const currentTime = new Date();
+
+                        if (currentTime >= examStart && currentTime <= examEnd) {
+                            const TestBtn = document.getElementById(`takeTest_${exam.examID}`);
+                            TestBtn.disabled = false;
+                        }
                     });
 
                     // document.getElementById('editModal').style.display = "block";
                     // document.getElementById('editModal').style.opacity = "1";  // Ensure modal is visible
 
-                    // Event listeners for Edit Exam buttons
-                    const editButtons = document.querySelectorAll('.edit-btn');
-                    editButtons.forEach(button => {
-                        button.addEventListener('click', handleEditClick);
-                    });
                 } else {
                     console.error('Failed to fetch exams:', data.message);
                 }
@@ -243,50 +256,52 @@
             }
         }
 
-        function handleEditClick(event) {
-            const examID = this.getAttribute('data-exam-id');
-            const myevent = this.getAttribute('myevent');
-            if (myevent === "Take") {
-                takeExam(examID);
-            }
-            //alert(`Editing exam with ID: ${examID} and status: ${status}`);
-            // Implement your logic to handle the edit action here (e.g., sending data to the server)
+        // Function to handle starting the test
+        function startTest(examID) {
+            console.log("Hitting");
+            // Redirect to the test page or trigger the test-taking process
+            window.location.href = `/start_exam?examID=${examID}`; // Redirect to the take test page, passing the exam ID
         }
 
-        function updateExam(examID) {
-            const idData = { examID: examID };
-            fetch('/api/exams/myexam', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(idData),
-            })
-                .then(response => response.json())
-                .then(result => {
-                    // Assuming the result is an array and you're interested in the first item
-                    if (result.length === 0) {
-                        throw new Error("Exam not found.");
-                    }
+        // Optionally, you can periodically check the time to enable/disable the button in real-time
+        setInterval(() => {
+            const currentTime = new Date();
 
-                    const exam = result[0]; // Access the first item directly
+            examData.forEach(exam => {
+                // Use the full exam_start_date and combine with exam_start_time
+                const examStartDate = exam.start_date; // This already has the date and time in it
+                const examStartTime = exam.start_time; // This should be in HH:mm format
 
-                    // Populate modal with exam data directly from the response
-                    document.getElementById('edit_name').value = exam.name || '';
-                    console.log("Console Logging ::  " + exam.name);
-                    document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
-                    document.getElementById('edit_start_time').value = exam.start_time || '';
-                    document.getElementById('edit_duration').value = exam.duration || '';
-                    document.getElementById('edit_total_marks').value = exam.total_marks || '';
-                    document.getElementById('edit_passing_marks').value = exam.passing_marks || '';
+                const examEndTime = exam.end_time; // Same for the end time
 
-                    // Show the modal
-                    document.getElementById('editModal').style.display = "block";
-                    document.getElementById('editModal').style.opacity = "1";
-                })
-                .catch(error => console.error('Error fetching exam details:', error));
-        }
+                // Create Date objects in local time by combining date and time
+                const examStart = new Date(examStartDate); // Start date already has time
+                examStart.setHours(examStartTime.split(':')[0]); // Set hours
+                examStart.setMinutes(examStartTime.split(':')[1]); // Set minutes
 
+                const examEnd = new Date(examStartDate); // End date already has time
+                examEnd.setHours(examEndTime.split(':')[0]); // Set hours
+                examEnd.setMinutes(examEndTime.split(':')[1]); // Set minutes
+
+                // Check if the current time is within the exam time
+                const takeTestBtn = document.getElementById(`takeTest_${exam.examID}`);
+
+                // console.log("Current Time: ", currentTime);
+                // console.log("Start Time: ", examStart);
+                // console.log("End Time: ", examEnd);
+
+                // Enable or disable the test button based on the time comparison
+                if (currentTime >= examStart && currentTime <= examEnd) {
+                    takeTestBtn.disabled = false; // Enable the button if within the time range
+                    takeTestBtn.addEventListener('click', () => {
+                            console.log("In Action LIstener");
+                            startTest(exam.examID); // Call the function to start the test
+                        });
+                } else {
+                    takeTestBtn.disabled = true; // Disable otherwise
+                }
+            });
+        }, 1000); // Check every second
     </script>
 </body>
 
