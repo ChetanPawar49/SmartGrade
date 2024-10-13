@@ -9,7 +9,7 @@
     width: 15%; /* Occupy 33% of the screen */
     padding: 10px;
     display: grid; /* Use grid layout */
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Create columns that fit the size */
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); /* Create columns that fit the size */
     gap: 10px; /* Space between grid items */
     background-color: #f4f4f4; /* Background color */
     border-right: 1px solid #ccc; /* Right border */
@@ -33,6 +33,11 @@
 
 /* Filled state for answered questions */
 .progress-circle.filled {
+    background-color: #4caf50; /* Green background for answered questions */
+    color: white; /* White text */
+}
+
+.filled {
     background-color: #4caf50; /* Green background for answered questions */
     color: white; /* White text */
 }

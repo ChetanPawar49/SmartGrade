@@ -15,6 +15,7 @@ const submitButton = document.getElementById("submit-button");
 // Fetch questions from backend
 async function fetchQuestions() {
     //const examId = 1; // Replace this with dynamic examId if needed
+    console.log("Inside Fetch");
 
     try {
         const response = await fetch(`http://localhost:3000/get-questions`, {
@@ -36,9 +37,42 @@ async function fetchQuestions() {
 
         // Display the first question
         displayQuestion(currentQuestionIndex);
+
+        // Create progress circles after fetching questions
+        createProgressCircles();
     } catch (error) {
         console.error('Error fetching questions:', error);
     }
+}
+
+function createProgressCircles() {
+    console.log("Inside Progress Container");
+    const progressContainer = document.getElementById('progress-container');
+    progressContainer.innerHTML = ''; // Clear existing circles
+
+    // Create a circle for each question
+    questions.forEach((_, index) => {
+        const circle = document.createElement('div');
+        circle.className = 'progress-circle';
+        circle.textContent = index + 1; // Display question number
+        circle.addEventListener('click', () => {
+            // Jump to the clicked question when a circle is clicked
+            currentQuestionIndex = index;
+            displayQuestion(currentQuestionIndex);
+        });
+        progressContainer.appendChild(circle);
+    });
+}
+
+function updateProgressCircles() {
+    const circles = document.querySelectorAll('.progress-circle');
+    circles.forEach((circle, index) => {
+        if (userAnswers[index] !== null) {
+            circle.classList.add('filled'); // Mark as filled when answered
+        } else {
+            circle.classList.remove('filled');
+        }
+    });
 }
 
 // Function to display a question and its options
@@ -85,6 +119,8 @@ function displayQuestion(index) {
         nextButton.style.display = "inline-block";
         submitButton.style.display = "none";
     }
+
+    updateProgressCircles(); // Update progress circles on question change
 }
 
 // Save the selected answer for the current question
@@ -140,8 +176,8 @@ function saveAnswer() {
         userAnswers[currentQuestionIndex] = null; // If no option is selected
         alert(`No option selected for Question ID: ${questions[currentQuestionIndex].id}`);
     }
+    updateProgressCircles(); // Update progress circles on option selection
 }
-
 
 // Event listeners for navigation buttons
 prevButton.addEventListener("click", (e) => {
@@ -178,8 +214,20 @@ submitButton.addEventListener("click", (e) => {
     alert("Exam Submitted. Thank you!");
     console.log(userAnswers); // This will log the user's answers, replace with actual submission logic
     document.getElementById("quiz").style.display = "none"; // Hide the quiz
-    document.getElementById("result").style.display = "block"; // Show the result page
+    // document.getElementById("result").style.display = "block"; // Show the result page
+    document.getElementById("progress-container").style.display = "none"; // Hide the progress container
+    
+    window.location.href = `/studentInterface.html`;
+    // Change the frame locations using parent
+    // parent.frames['left'].location.href = `/studentSide.html`;
+    // parent.frames['right'].location.href = `/studentExamDisplay.html`;
 });
 
 // Fetch questions when the page loads
-window.onload = fetchQuestions;
+// window.onload = fetchQuestions;
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchQuestions();
+    createProgressCircles(); // Create progress circles when page loads
+    console.log("Done");
+});
