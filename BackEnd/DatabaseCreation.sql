@@ -60,8 +60,8 @@ CREATE TABLE `Exam_Master` (
     `start_time` TIME NOT NULL,
 	`end_time` TIME NOT NULL,
     -- `duration` INT NOT NULL,
-    `total_marks` INT NOT NULL,
-    `passing_marks` INT NOT NULL,
+    `total_marks` INT DEFAULT 0,
+    `passing_marks` INT DEFAULT 0,
 	`timestamp` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -103,15 +103,20 @@ ALTER TABLE `Student` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`exam
 
 ALTER TABLE `Question_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
 
-ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Student` (`examID`);
-
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question_Master` (`questionID`);
 
-ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
-
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `User_Master` (`userID`);
+
+-- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY `examID`;
+-- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY questionID;
+-- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY applicationID;
+-- ALTER TABLE `Question_Master` DROP FOREIGN KEY `examID`;
+
+-- ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Student` (`examID`);
+
+-- ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
 
 SELECT * FROM user_master;
 SELECT * FROM question_master;
@@ -125,9 +130,12 @@ drop table Attempt_Master;
 
 truncate question_master;
 truncate exam_master;
+truncate Attempt_Master;
 truncate notices;
 
-alter table question_master drop timestamp;
+SHOW CREATE TABLE `Question_Master`;
+
+-- alter table question_master drop timestamp;
 
 SHOW TABLES;
 

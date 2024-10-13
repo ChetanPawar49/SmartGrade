@@ -226,8 +226,56 @@ submitButton.addEventListener("click", (e) => {
 // Fetch questions when the page loads
 // window.onload = fetchQuestions;
 
+// Timer setup
+function startTimer(duration, display, progressBar) {
+    let startTime = Date.now();
+    let timeInterval = setInterval(function () {
+        let elapsed = Math.floor((Date.now() - startTime) / 1000); // Time in seconds
+        let timeLeft = duration - elapsed;
+
+        // Convert timeLeft to minutes and seconds
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+
+        // Format time with leading zero if needed
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        // Update the display
+        display.textContent = minutes + ":" + seconds;
+
+        // Calculate and update progress bar width
+        let percentage = (timeLeft / duration) * 100;
+        progressBar.style.width = percentage + "%";
+
+        // Stop the timer when time runs out
+        if (timeLeft <= 0) {
+            clearInterval(timeInterval);
+            display.textContent = "Time's up!";
+            progressBar.style.width = "0%";
+            // Auto-submit the form when time's up
+            // document.getElementById('quiz-form').submit();
+            // Check if the quiz form exists before submitting
+            const quizForm = document.getElementById('quiz-form');
+            if (quizForm) {
+                console.log("Success");
+                saveAnswer();
+                quizForm.submit(); // Auto-submit the form when time's up
+                window.location.href = `/studentInterface.html`;
+            } else {
+                console.error("Quiz form not found!");
+            }
+        }
+    }, 1000); // Updates every second
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchQuestions();
     createProgressCircles(); // Create progress circles when page loads
     console.log("Done");
+
+    let totalDuration = 1 * 60; // 1 minute in seconds
+    let display = document.getElementById('time-left');
+    let progressBar = document.getElementById('timer-bar');
+    startTimer(totalDuration, display, progressBar);
 });
