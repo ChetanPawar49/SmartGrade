@@ -1,126 +1,168 @@
-/* General styling for the quiz container */
-.quiz-container {
-    display: flex; /* Use flexbox for layout */
-    height: 100vh; /* Full viewport height */
+/* Reset some default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Progress container on the left */
-.progress-container {
-    width: 15%; /* Occupy 33% of the screen */
-    padding: 10px;
-    display: grid; /* Use grid layout */
-    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); /* Create columns that fit the size */
-    gap: 10px; /* Space between grid items */
-    background-color: #f4f4f4; /* Background color */
-    border-right: 1px solid #ccc; /* Right border */
-    height: auto; /* Auto height for responsiveness */
-    overflow-y: auto; /* Scroll if content overflows */
-}
-
-/* Individual progress circles (question numbers) */
-.progress-circle {
-    width: 50px; /* Diameter of circle */
-    height: 50px;
-    border-radius: 50%; /* Circular shape */
-    background-color: #e0e0e0; /* Default background color */
-    text-align: center; /* Center text */
-    line-height: 50px; /* Center text vertically */
-    font-weight: bold; /* Bold text */
-    color: #333; /* Text color */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for background color */
-}
-
-/* Filled state for answered questions */
-.progress-circle.filled {
-    background-color: #4caf50; /* Green background for answered questions */
-    color: white; /* White text */
-}
-
-.filled {
-    background-color: #4caf50; /* Green background for answered questions */
-    color: white; /* White text */
-}
-
-/* Timer container */
-.timer-container {
-    display: flex; /* Align timer elements */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    background: linear-gradient(to right, #777bf1, #9884f4);
+    color: #333;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 20px; /* Space below timer */
+    min-height: 100vh;
 }
 
-/* Timer bar style */
-.timer-bar {
-    width: 100%; /* Full width for the timer bar */
-    height: 10px; /* Height of the timer bar */
-    background-color: #e0e0e0; /* Background color */
-    margin-right: 10px; /* Space between bar and time left */
-    border-radius: 5px; /* Rounded corners */
+.quiz-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
+    width: 80%;
+    max-width: 800px;
+    overflow: hidden;
 }
 
-/* Quiz content on the right */
+/* Progress container */
+.progress-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.progress-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    font-weight: bold;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.progress-circle.filled {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Quiz section */
 #quiz {
-    width: 67%; /* Occupy remaining space (67%) */
-    padding: 20px; /* Padding for quiz content */
+    padding: 20px;
 }
 
-/* Question container */
+.timer-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.timer-bar {
+    background-color: #007bff;
+    height: 10px;
+    width: 100%;
+    border-radius: 5px;
+    transition: width 1s linear;
+}
+
+.time-left {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Question and options */
 .question-container {
-    padding: 20px; /* Space inside question box */
-    border: 1px solid #ccc; /* Border around question box */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #ffffff; /* White background for question */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    margin-bottom: 20px; /* Space below the question */
+    margin-bottom: 20px;
 }
 
-/* Option styling */
-.option {
-    margin: 10px 0; /* Vertical spacing between options */
-    font-size: 16px; /* Font size for options */
+.question-id {
+    font-size: 0.8rem;
+    color: #888;
 }
 
-/* Styling for radio buttons */
-input[type="radio"] {
-    margin-right: 10px; /* Space between radio button and label */
+.question {
+    font-size: 1.2rem;
+    margin: 10px 0 20px 0;
+    background-color: #9884f4;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
 }
 
-/* Button container styling */
+.options {
+    margin-top: 10px;
+}
+
+.options label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+/* Button styles */
 .btn-container {
-    display: flex; /* Align buttons horizontally */
-    justify-content: space-between; /* Space between buttons */
-    margin-top: 10px; /* Space above button container */
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
-/* General button styling */
 .btn {
-    padding: 10px 15px; /* Padding inside buttons */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #007bff; /* Primary button color */
-    color: white; /* White text */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s, transform 0.2s; /* Smooth transition for background color and scale */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Button hover effect */
+.btn-prev {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-next {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-save {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-submit {
+    background-color: #dc3545;
+    color: white;
+}
+
 .btn:hover {
-    background-color: #0056b3; /* Darker shade on hover */
-    transform: scale(1.05); /* Slightly scale up on hover */
+    opacity: 0.9;
 }
 
-/* Submit button disabled state */
-.btn:disabled {
-    background-color: #cccccc; /* Grey background when disabled */
-    cursor: not-allowed; /* Not allowed cursor */
-}
-
-/* Result container styling */
+/* Result section */
 .result-container {
-    display: none; /* Hide by default */
-    padding: 20px; /* Padding inside result box */
-    border: 1px solid #ccc; /* Border around result box */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #ffffff; /* White background for result */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    display: none; /* Hide result section by default */
+    padding: 20px;
+    text-align: center;
+}
+
+#home-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#home-button:hover {
+    background-color: #0056b3;
 }
