@@ -761,8 +761,11 @@ app.post('/updateExam', async (req, res) => {
 //Delete an Exam
 app.post('/delExam', async (req, res) => {
     const { examID } = req.body;
-    const sql = "DELETE FROM question_master WHERE examID=?";
     const connection = await pool.getConnection();
+    const sql2 = "DELETE FROM attempt_master WHERE examID=?";
+    const connection2 = await pool.getConnection();
+    const [result3] = await connection.execute(sql2, [examID]);
+    const sql = "DELETE FROM question_master WHERE examID=?";
     const [result1] = await connection.execute(sql, [examID]);
     const sql1 = "DELETE FROM exam_master WHERE examID=?";
     const [result2] = await connection.execute(sql1, [examID]);

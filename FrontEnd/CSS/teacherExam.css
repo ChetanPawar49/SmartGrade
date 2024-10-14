@@ -1,144 +1,79 @@
-/* General form styling */
-#examForm {
-    width: 800px;
-    margin: 0 auto;
-    padding: 30px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    /* background-color: #f9f9f9; */
-    background: linear-gradient(to right, #777bf1, #9884f4);
-    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
+/* General body styling */
+body {
     font-family: Arial, sans-serif;
-    margin-top: 35px;
-}
-
-#examForm h2 {
-    text-align: center;
-    /* color: #5746a1; */
-    color: #4e3aa8;
-    font-weight: bolder;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
 }
 
 .examh h2 {
     text-align: center;
-    /* color: #5746a1; */
-    color: #4e3aa8;
-    font-weight: bolder;
-    padding: 8px;
-    margin: 15px;
-    background-color: #9884f4;
-}
-
-/* Form labels and inputs */
-#examForm label {
-    font-size: 16px;
     color: #333;
-    display: block;
-    margin-bottom: 8px;
-}
-
-#examForm input {
-    width: 100%;
-    padding: 8px;
+    font-size: 28px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
 }
 
-/* Button container */
-.button-container {
-    text-align: center;
-}
-
-.create-questions-btn {
-    /* background-color: #4CAF50; */
-    background-color: #4348cc;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.create-questions-btn:hover {
-    /* background-color: #45a049; */
-    background-color: #3016a7;
-    box-shadow: 0px 0px 8px 5px rgba(44, 92, 158, 0.36);
-    transform: scale(1.05);
-}
-
-/* Responsive layout */
-@media (max-width: 500px) {
-    #examForm {
-        width: 90%;
-    }
-
-    #examForm input {
-        padding: 10px;
-    }
-
-    .create-questions-btn {
-        width: 100%;
-        padding: 12px;
-    }
-}
-
-.exam-card {
-    background-color: #fff;
+#examForm {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    margin: 15px 0;
-    border: 1px solid #ddd;
+    background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.exam-card h3 {
-    color: #5746a1;
-    font-size: 20px;
-    font-weight: bold;
+#examTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.exam-details {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 10px;
+#examTable th {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px;
+    text-align: left;
 }
 
-.exam-details div {
-    flex: 1 1 200px;
-    margin-bottom: 10px;
+#examTable td {
+    padding: 10px;
+    text-align: left;
 }
 
-.exam-details div span {
-    font-weight: bold;
-    display: block;
-    color: #666;
+#examTable tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#examTable th,
+#examTable td {
+    border: 1px solid #ddd;
+}
+
+/* Buttons */
+button {
+    padding: 6px 12px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .edit-btn {
-    /* background-color: #007bff; */
-    background: linear-gradient(to right, #9884f4, #585de4);
+    background-color: #2196F3;
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
-    margin-right: 10px;
 }
 
-.edit-btn:hover {
-    /* background-color: #0056b3; */
-    background: linear-gradient(to right, #5b4d96, #2c2f82);
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.8;
 }
 
 /* Modal Styles */
-/* .modal {
+.modal {
     display: none;
     position: fixed;
     z-index: 1;
@@ -146,20 +81,17 @@
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4);
-    padding-top: 60px;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
+    background-color: #fff;
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 8px;
+    width: 60%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .close {
@@ -174,127 +106,51 @@
     color: black;
     text-decoration: none;
     cursor: pointer;
-} */
-
-/* Modal styling */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
 }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered */
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%; /* Full width on smaller screens */
-    max-width: 600px; /* Set a max width */
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease; /* Smooth fade in effect */
-}
-
-/* Close button */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Title */
-.title {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
+.modal .title {
+    font-size: 22px;
     margin-bottom: 20px;
-    color: #4e3aa8; /* Title color */
+    color: #333;
 }
 
-/* Form content */
-.content {
-    display: flex;
-    flex-direction: column;
-}
-
-.user-details {
+.modal .user-details {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 
-/* .input-box {
-    display: block;
+.modal .input-box {
     width: 48%;
     margin-bottom: 15px;
 }
 
-.input-box .details {
-    font-size: 16px;
-    font-weight: 500;
+.modal .input-box .details {
+    font-size: 14px;
     margin-bottom: 5px;
     display: block;
-    color: #333;
+    color: #555;
 }
 
-.input-box input {
+.modal .input-box input {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 5px;
     box-sizing: border-box;
-    transition: border-color 0.2s;
 }
 
-.input-box input:focus {
-    border-color: #4e3aa8;
-} */
-
-/* Submit button */
-#edit_submit {
-    background-color: #4e3aa8;
+.modal input[type="submit"] {
+    background-color: #4CAF50;
     color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 12px;
+    padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
+    border-radius: 5px;
+    border: none;
     margin-top: 20px;
-    width: 100%;
-    transition: background-color 0.3s;
 }
 
-#edit_submit:hover {
-    background-color: #3b2b91;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .input-box {
-        width: 100%; /* Full width for smaller screens */
-    }
-}
-
-/* Fade-in effect */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.modal input[type="submit"]:hover {
+    background-color: #45a049;
 }
