@@ -380,7 +380,7 @@ app.get('/question', async (req, res) => {
 
 app.get('/attempt', async (req, res) => {
     try {
-        const [results] = await pool.query('SELECT attemptID AS id, examID, questionID, applicationID, selected_option, correct_option, marks_obt FROM Attempt_Master');
+        const [results] = await pool.query('SELECT attemptID AS id, examID, questionID, applicationID, selected_option, correct_option, marks_obt, status FROM Attempt_Master');
         res.json(results);
     } catch (err) {
         console.error('Error fetching attempts data:', err);
@@ -436,6 +436,7 @@ app.get('/getExams', async (req, res) => {
 
         // Using connection.execute for parameterized query
         const [result] = await connection.execute('SELECT * FROM Exam_Master WHERE teacherId = ?', [req.session.userID]);
+        console.log(result);
 
         // console.log(result);
         // const [result] = await connection.execute(sql, [req.session.examID]);
@@ -490,6 +491,65 @@ app.get('/teacherquestion', (req, res) => {
             console.log('File sent:', filePath);
         }
     });
+});
+
+app.get('/getApplicantResult', (req, res) => {
+    console.log("Applicant Results :", req.session.userID);
+    const filePath = path.join(__dirname, '../Frontend/HTML/studentResults.html');
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(err.status || 500).send('Error sending file');
+        } else {
+            res.fil
+            console.log('File sent:', filePath);
+        }
+    });
+});
+
+//Result
+app.get('/ApplicantResult', async (req, res) => {
+    const appID = req.session.userID; // Get the applicant ID from the session
+    const sql = `SELECT 
+                    UM.userID,
+                    UM.username,
+                    SUM(QM.question_marks) AS marks_obtained,
+                    COUNT(*) AS correct_answers,
+                    EM.examID,
+                    EM.name,
+                    EM.total_marks,  -- Assuming total_marks is in Exam_Master
+                    EM.passing_marks,  -- To compare marks with passing_marks
+                    AM.status,
+                    CASE 
+                        WHEN SUM(QM.question_marks) >= EM.passing_marks THEN 'Passed'
+                        ELSE 'Failed'
+                    END AS result
+                FROM 
+                    User_Master UM
+                JOIN 
+                    Attempt_Master AM ON UM.userID = AM.applicationID
+                JOIN 
+                    Question_Master QM ON AM.questionID = QM.questionID
+                JOIN 
+                    Exam_Master EM ON AM.examID = EM.examID  -- Join with Exam_Master to get total_marks and passing_marks
+                WHERE 
+                    AM.selected_option = QM.answer_key
+                    AND AM.examID = QM.examID
+                GROUP BY 
+                    AM.status, EM.examID, UM.userID, UM.username, EM.total_marks, EM.passing_marks;
+                `
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [result] = await connection.query(sql, [appID]); // Use connection.query instead of connection.execute
+        res.status(200).json(result); // Correct the syntax for sending JSON response
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' }); // Send an error response
+    } finally {
+        if (connection) connection.release(); // Release the connection back to the pool
+    }
 });
 
 // // POST route to handle adding questions
@@ -662,6 +722,7 @@ app.post('/addExam', async (req, res) => {
 
     console.log("Adding Exam");
     const { examName, examDate, examTime, examEndTime } = req.body;
+    console.log(examDate);
 
     let connection;
     console.log("TeacherID:" + req.session.userID);
@@ -755,7 +816,6 @@ app.post('/updateExam', async (req, res) => {
             connection.release(); // Make sure to release the connection
         }
     }
-
 });
 
 //Delete an Exam
@@ -772,6 +832,39 @@ app.post('/delExam', async (req, res) => {
     connection.release();
     res.status(200).json({ redirectURL: "/teacherExamDisplay.html", receivedData: req.body });
     // res.status(200).json({ redirectURL: "/api/exam", receivedData: req.body });
+});
+
+//Update Questions Api
+app.post('/updateQuestion', async (req, res) => {
+    const { examID, questionId, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks } = req.body
+    // const examID = req.session.examID;
+    console.log(examID);
+    let connection;
+    console.log(correctOption);
+    // Modified query to fetch questions and their corresponding options from question_master
+    const query = `select * from question_master where questionID=?;`;
+    const ins_query = `Insert Into question_master(examID,question,optionA,optionB,optionC,optionD,answer_key,question_marks) values(?,?,?,?,?,?,?,?);`;
+    const update_query = `UPDATE question_master set question=?,optionA=?,optionB=?,optionC=?,optionD=?,answer_key=?,question_marks=? where questionID=?`;
+    try {
+        // Fetch questions and options from the database
+        connection = await pool.getConnection();
+
+        const [results] = await connection.query(query, [questionId]);
+
+        if (results.length === 0) {
+            //return res.status(404).json({ message: 'No questions found for this exam.' });
+            const [ins_result] = await connection.query(ins_query, [examID, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks]);;
+
+        } else {
+            const [update_result] = await connection.query(update_query, [updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks, questionId]);
+        }
+        res.status(200).json({ message: "Success" });
+    } catch (err) {
+        console.error('Error fetching questions:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
 });
 
 // Start Exam
@@ -795,11 +888,20 @@ app.post('/get-questions', async (req, res) => {
     let connection;
 
     // Modified query to fetch questions and their corresponding options from question_master
+    // const query = `
+    //   SELECT questionID, question, optionA, optionB, optionC, optionD
+    //   FROM question_master
+    //   WHERE examID = ?;
+    // `;
+
     const query = `
-      SELECT questionID, question, optionA, optionB, optionC, optionD
-      FROM question_master
-      WHERE examID = ?;
-    `;
+            SELECT q.questionID, q.examID, q.question, q.optionA, q.optionB, q.optionC, q.optionD, 
+            e.start_time, e.end_time 
+            FROM question_master q 
+            JOIN exam_master e ON q.examID = e.examID
+            WHERE q.examID = ?
+            GROUP BY q.questionID, q.examID, q.question, q.optionA, q.optionB, q.optionC, q.optionD, e.start_time, e.end_time;
+        `;
 
     try {
         // Fetch questions and options from the database
@@ -837,7 +939,7 @@ app.post('/InsertAttempt', async (req, res) => {
 
     const sql = 'Select * from Attempt_Master where examID=? and questionID=? and applicationID=?';
     // Modified query to fetch questions and their corresponding options from question_master
-    const query = `INSERT INTO Attempt_Master (examID, questionID, applicationID, selected_option) VALUES(?,?,?,?)`;
+    const query = `INSERT INTO Attempt_Master (examID, questionID, applicationID, selected_option, status) VALUES(?,?,?,?,'completed')`;
     const updateQuery = 'UPDATE Attempt_Master SET selected_option = ? WHERE examID = ? AND questionID = ? AND applicationID = ?';
     try {
         // Fetch questions and options from the database
@@ -848,7 +950,7 @@ app.post('/InsertAttempt', async (req, res) => {
             console.log(results);
             return res.status(200).json({ message: 'Attempted' });
         } else {
-            const [results] = await connection.query(query, [examId, questionId, req.session.userID, sel_answer]);
+            const [results] = await connection.query(query, [examId, questionId, req.session.userID, sel_answer,]);
             console.log(results);
             return res.status(200).json({ message: 'Attempted' });
         }
@@ -857,6 +959,120 @@ app.post('/InsertAttempt', async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     } finally {
         if (connection) connection.release(); // Release the database connection
+    }
+});
+
+//Get Editing Questions
+app.post('/get-my-questions', async (req, res) => {
+    console.log("In get my ques");
+    const { examId } = req.body;
+    // const examId = req.examId; // examId comes from URL params
+    // const examId = req.session.examID;
+    // console.log(examId);
+    let connection;
+
+    // Modified query to fetch questions and their corresponding options from question_master
+    const query = `select q.questionID, q.question, q.optionA, q.optionB, q.optionC, q.optionD, e.start_time,e.end_time, q.question_marks from question_master q join exam_master e on e.examID=?;`;
+
+    try {
+        // Fetch questions and options from the database
+        connection = await pool.getConnection();
+
+        const [results] = await connection.query(query, [examId]);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No questions found for this exam.' });
+        }
+        console.log(results);
+
+        // Format the questions and options into an array
+        const questionsArray = results.map(row => ({
+            id: row.questionID, // Add questionID to the object
+            question: row.question,
+            options: [row.optionA, row.optionB, row.optionC, row.optionD],
+            totalMarks: row.question_marks
+        }));
+
+        // Send the formatted questions array back to the frontend
+        res.json({ examId, questions: questionsArray, exam_end_time: results[0].exam_end_time });
+    } catch (err) {
+        console.error('Error fetching questions:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
+});
+
+app.get('/getExamIds', async (req, res) => {
+    const sql = "SELECT examID FROM exam_master";  // Fetch all examIDs from exam_master
+    const connection = await pool.getConnection();
+
+    try {
+        const [exams] = await connection.query(sql);  // No need for req.session.myid here as we fetch all exams
+        res.json(exams);  // Send the list of examIDs as a response
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    } finally {
+        connection.release();
+    }
+});
+
+app.post('/check-result', async (req, res) => {
+    const { examid } = req.body;
+
+    const connection = await pool.getConnection();
+
+    try {
+        // Query 1: Fetch passing marks (this is not needed since it's already handled in the second query)
+        // Query 2: Fetch attempt and question data
+        const fetchMarksQuery = `
+            SELECT 
+                UM.userID,
+                UM.username,
+                UM.firstname,
+                UM.lastname,
+                SUM(QM.question_marks) AS marks_obtained,
+                COUNT(*) AS correct_answers,
+                EM.examID,
+                EM.name,
+                EM.total_marks,
+                EM.passing_marks,
+                AM.status,
+                CASE 
+                    WHEN SUM(QM.question_marks) >= EM.passing_marks THEN 'Passed'
+                    ELSE 'Failed'
+                END AS result
+            FROM 
+                User_Master UM
+            JOIN 
+                Attempt_Master AM ON UM.userID = AM.applicationID
+            JOIN 
+                Question_Master QM ON AM.questionID = QM.questionID
+            JOIN 
+                Exam_Master EM ON AM.examID = EM.examID
+            WHERE 
+                UM.usertype = 'Student'
+                AND AM.selected_option = QM.answer_key
+                AND AM.examID = QM.examID
+                AND EM.examID = ?
+            GROUP BY 
+                UM.userID, UM.username, UM.firstname, UM.lastname, EM.examID, EM.name, EM.total_marks, EM.passing_marks, AM.status;
+        `;
+
+        const [attemptResults] = await connection.query(fetchMarksQuery, [examid]);
+
+        if (!attemptResults.length) {
+            return res.status(404).json({ message: 'No attempts found for this exam' });
+        }
+
+        // Directly return the result from the query
+        res.json(attemptResults);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    } finally {
+        connection.release();
     }
 });
 

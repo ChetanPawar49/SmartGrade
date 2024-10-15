@@ -69,15 +69,313 @@
                         </div>
                     </div>
                     <input id="edit_submit" type="submit" value="Save Changes">
+                    <input id="Addques" type="button" value="Add Question">
+                    <input id="edit_ques" type="button" value="Edit Questions">
                 </form>
+            </div>
+            <div class="questions-list-container" id="questions-list-container">
+                <!-- The list of questions will be inserted here dynamically -->
             </div>
         </div>
     </div>
 
     <script>
+        let currentExamID = ''; // Declare a global variable to store examID
+        const editQuesButton = document.getElementById('edit_ques');
+        const questionsListContainer = document.getElementById('questions-list-container');
+
         document.addEventListener('DOMContentLoaded', function () {
             fetchExams();
         });
+
+        // Add an event listener for the button click
+        editQuesButton.addEventListener('click', async function () {
+            const examId = currentExamID;
+            try {
+                // Fetch questions from the backend
+                const response = await fetch(`http://localhost:3000/get-my-questions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ examId: examId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const questions = data.questions;
+
+                // Clear previous questions
+                questionsListContainer.innerHTML = '';
+
+                // Display the questions
+                questions.forEach((question, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.classList.add('question-item');
+
+                    // Add editable question text
+                    const questionText = document.createElement('input');
+                    questionText.type = 'text';
+                    questionText.value = question.question;
+                    questionText.placeholder = 'Edit your question here';
+                    questionDiv.appendChild(questionText);
+                    const lineBreak = document.createElement('br');
+                    questionDiv.appendChild(lineBreak);
+
+                    const totalMarksInput = document.createElement('input');
+                    totalMarksInput.type = 'number'; // Using number input for total marks
+                    totalMarksInput.value = question.totalMarks || ''; // Assuming totalMarks is sent from the backend
+                    totalMarksInput.placeholder = 'Total Marks';
+                    questionDiv.appendChild(totalMarksInput);
+
+                    // Add options with editable input fields and radio buttons
+                    question.options.forEach((option, i) => {
+                        const optionDiv = document.createElement('div');
+
+                        // Create a text input for each option
+                        const optionInput = document.createElement('input');
+                        optionInput.type = 'text';
+                        optionInput.value = option; // Set the current option text
+                        optionInput.placeholder = `Option ${i + 1}`;
+
+                        // Create a radio button for selecting the correct answer
+                        // const optionRadio = document.createElement('input');
+                        // optionRadio.type = 'radio';
+                        // optionRadio.type = 'text';
+                        // optionRadio.name = `correct-option-${index}`; // Group radio buttons by question index
+                        // optionRadio.value = `option-${i}`; // Set the value to identify the option
+
+                        // Check if this option is the correct answer (you may need to adjust this logic)
+                        if (i === question.correctOptionIndex) { // Assuming correctOptionIndex is provided
+                            optionRadio.checked = true; // Mark as checked if it's the correct answer
+                        }
+
+                        // Add the radio button and text input to the option div
+                        // optionDiv.appendChild(optionRadio);
+                        optionDiv.appendChild(optionInput);
+                        questionDiv.appendChild(optionDiv);
+                    });
+
+                    // Create a select dropdown for selecting the correct answer
+                    const correctOptionSelect = document.createElement('select');
+
+                    // Array for option labels
+                    const optionLabels = ['OptionA', 'OptionB', 'OptionC', 'OptionD'];
+
+                    // Loop to create 4 option elements (Option A to Option D)
+                    optionLabels.forEach((label, i) => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = `option-${i}`; // Set value to identify the option
+                        optionElement.textContent = label; // Display the label (Option A, Option B, etc.)
+
+                        // Check if this option is the correct answer
+                        if (i === question.correctOptionIndex) { // Assuming correctOptionIndex is provided
+                            optionElement.selected = true; // Mark as selected if it's the correct answer
+                        }
+
+                        correctOptionSelect.appendChild(optionElement); // Append option to select
+                    });
+
+                    // Add the select element to the question div (after all options)
+                    questionDiv.appendChild(correctOptionSelect);
+
+                    // Add save button for each question
+                    const saveButton = document.createElement('button');
+                    saveButton.textContent = 'Save Changes';
+                    saveButton.addEventListener('click', async function () {
+                        const updatedQuestion = questionText.value;
+                        const updatedOptions = Array.from(questionDiv.querySelectorAll('input[type="text"]'))
+                            .map(input => input.value); // Get values of option inputs
+
+                        // Find the selected correct option
+                        // const selectedOption = questionDiv.querySelector('select');
+                        // const correctOption = correctOptionSelect.value;
+
+                        // Find the selected correct option
+                        const correctOption = correctOptionSelect.value; // Gets values like "option-0", "option-1", etc.
+
+                        // Convert `option-0`, `option-1`, etc. to 'A', 'B', 'C', 'D'
+                        const correctOptionLabel = optionLabels[parseInt(correctOption.split('-')[1])];
+
+                        // Prepare data to send to server
+                        const updateData = {
+                            questionId: question.id,
+                            updatedQuestion: updatedQuestion,
+                            optionA: updatedOptions[1],
+                            optionB: updatedOptions[2],
+                            optionC: updatedOptions[3],
+                            optionD: updatedOptions[4],
+                            totalMarks: totalMarksInput.value,
+                            correctOption: correctOptionLabel // Send the selected correct option
+                        };
+                        console.log(updateData);
+                        // Send updated data to server
+                        const updateResponse = await fetch('/updateQuestion', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updateData)
+                        });
+
+                        if (updateResponse.ok) {
+                            alert('Question updated successfully!');
+                            // Optionally, refresh the question list
+                        } else {
+                            alert('Failed to update question');
+                        }
+                    });
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete Question';
+                    deleteButton.classList.add('delete-button'); // Optional: add a class for styling
+                    deleteButton.addEventListener('click', async function () {
+                        const confirmation = confirm('Are you sure you want to delete this question?');
+                        if (confirmation) {
+                            const deleteResponse = await fetch('/deleteQuestion', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ questionId: question.id })
+                            });
+
+                            if (deleteResponse.ok) {
+                                alert('Question deleted successfully!');
+                                questionDiv.remove(); // Remove the question from the UI
+                            } else {
+                                alert('Failed to delete question');
+                            }
+                        }
+                    });
+
+                    questionDiv.appendChild(saveButton);
+                    questionDiv.appendChild(deleteButton);
+                    questionsListContainer.appendChild(questionDiv);
+                });
+
+            } catch (error) {
+                console.error('Error fetching questions:', error);
+            }
+        });
+
+        // Function to create a new question
+        function createNewQuestion() {
+            const newQuestionDiv = document.createElement('div');
+            newQuestionDiv.classList.add('question-item');
+
+            // Add empty question text input
+            const newQuestionText = document.createElement('input');
+            newQuestionText.type = 'text';
+            newQuestionText.placeholder = 'Enter your question here';
+            newQuestionDiv.appendChild(newQuestionText);
+
+            // Add total marks input field
+            const totalMarksInput = document.createElement('input');
+            totalMarksInput.type = 'number';
+            totalMarksInput.placeholder = 'Enter total marks';
+            newQuestionDiv.appendChild(totalMarksInput);
+
+            // Create empty option fields and radio buttons
+            for (let i = 0; i < 4; i++) {
+                const optionDiv = document.createElement('div');
+
+                // Create a text input for each option
+                const optionInput = document.createElement('input');
+                optionInput.type = 'text';
+                optionInput.placeholder = `Option ${i + 1}`;
+
+                // Create a radio button for selecting the correct answer
+                // const optionRadio = document.createElement('input');
+                // optionRadio.type = 'radio';
+                // optionRadio.name = `new-correct-option`; // Group radio buttons for new question
+                // optionRadio.value = `new-option-${i}`; // Set the value to identify the option
+
+                // Add the radio button and text input to the option div
+                // optionDiv.appendChild(optionRadio);
+                optionDiv.appendChild(optionInput);
+                newQuestionDiv.appendChild(optionDiv);
+            }
+
+            // Create a select dropdown for selecting the correct answer
+            const correctOptionSelect = document.createElement('select');
+
+            // Array for option labels
+            const optionLabels = ['OptionA', 'OptionB', 'OptionC', 'OptionD'];
+
+            // Loop to create 4 option elements (Option A to Option D)
+            optionLabels.forEach((label, i) => {
+                const optionElement = document.createElement('option');
+                optionElement.value = `option-${i}`; // Set value to identify the option
+                optionElement.textContent = label; // Display the label (Option A, Option B, etc.)
+
+                // Check if this option is the correct answer
+                // if (i === question.correctOptionIndex) { // Assuming correctOptionIndex is provided
+                    // optionElement.selected = true; // Mark as selected if it's the correct answer
+                // }
+
+                correctOptionSelect.appendChild(optionElement); // Append option to select
+            });
+
+            // Add the select element to the question div (after all options)
+            newQuestionDiv.appendChild(correctOptionSelect);
+
+            // Add save button for the new question
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Question';
+            saveButton.addEventListener('click', async function () {
+                const newQuestion = newQuestionText.value;
+                const newOptions = Array.from(newQuestionDiv.querySelectorAll('input[type="text"]'))
+                    .map(input => input.value); // Get values of option inputs
+
+                // Find the selected correct option
+                const correctOption = correctOptionSelect.value; // Gets values like "option-0", "option-1", etc.
+
+                // Convert `option-0`, `option-1`, etc. to 'A', 'B', 'C', 'D'
+                const correctOptionLabel = optionLabels[parseInt(correctOption.split('-')[1])];
+
+                const totalMarks = totalMarksInput.value;
+                // Prepare data to send to server
+                const newQuestionData = {
+                    examID: currentExamID,
+                    updatedQuestion: newQuestion,
+                    optionA: newOptions[1],
+                    optionB: newOptions[2],
+                    optionC: newOptions[3],
+                    optionD: newOptions[4],
+                    totalMarks: totalMarks,
+                    correctOption: correctOptionLabel // Send the selected correct option
+                };
+                console.log(newQuestionData);
+                // Send new question data to server
+                const addResponse = await fetch('/updateQuestion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newQuestionData)
+                });
+
+                if (addResponse.ok) {
+                    alert('Question added successfully!');
+                    // Optionally, refresh the question list or append the new question to the display
+                } else {
+                    alert('Failed to add question');
+                }
+            });
+
+            newQuestionDiv.appendChild(saveButton);
+            questionsListContainer.appendChild(newQuestionDiv);
+        }
+
+        // Add "Add Question" button at the end of questions list
+        const addQuestionButton = document.getElementById('Addques');
+        //addQuestionButton.textContent = 'Add Question';
+        addQuestionButton.addEventListener('click', createNewQuestion);
+        //questionsListContainer.appendChild(addQuestionButton);
 
         // Function to fetch exams from the backend and populate the form
         async function fetchExams() {
@@ -101,22 +399,28 @@
                     data.exams.forEach(exam => {
                         const row = document.createElement('tr');
 
+                        // console.log((new Date(exam.start_date)).toLocaleString());
+                        const dateObject = new Date(exam.start_date);
+                        const localTime = dateObject.toLocaleString();
+
                         // Date and Time Format
-                        const date = exam.start_date.split('T')[0];
+                        // const date = localTime.split('T')[0];
+                        const date = localTime.split(',')[0];
+                        console.log(date);
                         let startTime = exam.start_time;
                         let endTime = exam.end_time;
 
-                        let [hours1, minutes1] = startTime.split(':'); 
-                        let [hours2, minutes2] = endTime.split(':'); 
+                        let [hours1, minutes1] = startTime.split(':');
+                        let [hours2, minutes2] = endTime.split(':');
 
-                        hours1 = parseInt(hours1); 
-                        hours2 = parseInt(hours2); 
+                        hours1 = parseInt(hours1);
+                        hours2 = parseInt(hours2);
 
                         const ampm1 = hours1 >= 12 ? 'PM' : 'AM';
                         const ampm2 = hours2 >= 12 ? 'PM' : 'AM';
 
-                        hours1 = hours1 % 12 || 12; 
-                        hours2 = hours2 % 12 || 12; 
+                        hours1 = hours1 % 12 || 12;
+                        hours2 = hours2 % 12 || 12;
 
                         row.innerHTML = `
                             <td>${exam.examID}</td>
@@ -164,7 +468,85 @@
         }
 
         function updateExam(examID) {
-            // Same logic to update the exam as in the original code...
+            const idData = { examID: examID };
+            currentExamID = examID;
+            fetch('/api/exams/myexam', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(idData),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    // Assuming the result is an array and you're interested in the first item
+                    if (result.length === 0) {
+                        throw new Error("Exam not found.");
+                    }
+
+                    const exam = result[0]; // Access the first item directly
+
+                    // Populate modal with exam data directly from the response
+                    document.getElementById('edit_name').value = exam.name || '';
+                    console.log("Console Logging ::  " + exam.name);
+                    console.log("Console Logging ::  " + exam.examID);
+                    document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
+                    document.getElementById('edit_start_time').value = exam.start_time || '';
+                    document.getElementById('edit_end_time').value = exam.end_time || '';
+                    document.getElementById('edit_total_marks').value = exam.total_marks || '';
+                    document.getElementById('edit_passing_marks').value = exam.passing_marks || '';
+
+                    // Show the modal
+                    document.getElementById('editModal').style.display = "block";
+                    document.getElementById('editModal').style.opacity = "1";
+                })
+                .catch(error => console.error('Error fetching exam details:', error));
+        }
+
+        // Close modal when clicking on <span> (x)
+        document.getElementById('closeModal').onclick = function () {
+            document.getElementById('editModal').style.display = "none";
+        }
+
+        // Close modal when clicking anywhere outside of the modal
+        window.onclick = function (event) {
+            if (event.target === document.getElementById('editModal')) {
+                document.getElementById('editModal').style.display = "none";
+            }
+        }
+
+        // Handle the form submission to save changes
+        document.getElementById('edit-exam-form').onsubmit = function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // const examID = document.querySelector('.edit-btn').getAttribute('data-exam-id'); // Get the exam ID from the button
+            const updatedData = {
+                examID: currentExamID, // Use the globally stored examID
+                name: document.getElementById('edit_name').value,
+                exam_start_date: document.getElementById('edit_start_date').value,
+                exam_start_time: document.getElementById('edit_start_time').value,
+                exam_end_time: document.getElementById('edit_end_time').value,
+                total_marks: document.getElementById('edit_total_marks').value,
+                passing_marks: document.getElementById('edit_passing_marks').value,
+            };
+
+            // console.log("Console Logging ::  " + examID);
+            fetch('/updateExam', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedData),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Exam updated successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error updating exam!');
+                    }
+                })
+                .catch(error => console.error('Error updating exam:', error));
         }
 
         async function deleteExam(examID) {

@@ -8,7 +8,7 @@ body {
 
 .examh h2 {
     text-align: center;
-    color: #333;
+    color: #4e3aa8;
     font-size: 28px;
     margin-bottom: 20px;
 }
@@ -19,7 +19,8 @@ body {
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
 }
 
 #examTable {
@@ -81,7 +82,9 @@ button:hover {
     top: 0;
     width: 100%;
     height: 100%;
+    overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 60px;
 }
 
 .modal-content {
@@ -90,6 +93,7 @@ button:hover {
     padding: 20px;
     border: 1px solid #888;
     width: 60%;
+    max-width: 600px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
@@ -153,4 +157,109 @@ button:hover {
 
 .modal input[type="submit"]:hover {
     background-color: #45a049;
+}
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
+}
+
+.modal-content {
+    background-color: #f9f9f9;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%; /* Full width */
+    max-height: 80vh; /* Maximum height */
+    overflow-y: auto; /* Enable vertical scroll */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Question List Styling */
+.questions-list-container {
+    margin-top: 20px;
+    max-height: 50vh; /* Limit the height of the questions container */
+    overflow-y: auto; /* Enable scrolling */
+    border: 1px solid #ddd; /* Add a border */
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.question-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.question-item input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Option Styling */
+.question-item input[type="radio"] {
+    margin-right: 10px;
+}
+
+.question-item .option-div {
+    margin-bottom: 5px;
+}
+
+/* Save and Delete Buttons */
+.question-item button {
+    padding: 8px 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.question-item button:hover {
+    opacity: 0.9;
+}
+
+.question-item .save-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.question-item .delete-button {
+    background-color: #f44336;
+    color: white;
+    margin-left: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%; /* Make it more responsive on smaller screens */
+    }
 }

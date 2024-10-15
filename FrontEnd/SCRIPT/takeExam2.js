@@ -53,43 +53,54 @@ async function fetchQuestions() {
 
 // Timer setup
 function startTimer(examEndTime) {
-    const [hours, minutes, seconds] = examEndTime.split(':').map(Number);
-    const endTime = new Date();
-    endTime.setHours(hours, minutes, seconds, 0);
-    console.log("Exam end time :", endTime);
+    let startTime = Date.now();
+    let timeInterval = setInterval(function () {
+        let elapsed = Math.floor((Date.now() - startTime) / 1000); // Time in seconds
+        let timeLeft = duration - elapsed;
 
-    const startTime = Date.now(); // Use the current time as start time
-    const duration = (endTime - startTime) / 1000; // Total exam duration in seconds
+        // Convert timeLeft to minutes and seconds
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
 
-    let timeLeft = duration;
+        // Format time with leading zero if needed
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
 
-    const timerInterval = setInterval(() => {
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerDisplay.textContent = "Time's up!";
-            //progressBar.style.width = "100%";
-            progressBar.style.transform = "scaleX(0)";
-            // Auto-submit the exam when time is up
-            submitExam();
-        } else {    
-            timeLeft--;
+        // Update the display
+        display.textContent = minutes + ":" + seconds;
 
-            // Calculate hours, minutes, and seconds
-            const hoursLeft = Math.floor(timeLeft / 3600);
-            const totalMinutes = Math.floor((timeLeft % 3600) / 60);
-            const totalSeconds = Math.floor(timeLeft % 60);
+        // Calculate and update progress bar width
+        let percentage = (timeLeft / duration) * 100;
+        progressBar.style.width = percentage + "%";
 
-            // Format the display to include leading zeros
-            timerDisplay.textContent = `${hoursLeft}:${totalMinutes < 10 ? '0' : ''}${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
-
-            // Update progress bar
-            // const progressPercentage = ((duration - timeLeft) / duration) * 100;
-            // progressBar.style.width = `${progressPercentage}%`;
-
-            const progressPercentage = timeLeft / duration; // Calculate the remaining time percentage
-            progressBar.style.transform = `scaleX(${progressPercentage})`;
+        // Change color based on the percentage of time left
+        if (percentage > 60) {
+            progressBar.style.backgroundColor = "green"; // More than 60% time left
+        } else if (percentage > 30) {
+            progressBar.style.backgroundColor = "yellow"; // Between 30% and 60%
+        } else {
+            progressBar.style.backgroundColor = "red"; // Less than 30% time left
         }
-    }, 1000); // Update every second
+
+        // Stop the timer when time runs out
+        if (timeLeft <= 0) {
+            clearInterval(timeInterval);
+            display.textContent = "Time's up!";
+            progressBar.style.width = "0%";
+            // Auto-submit the form when time's up
+            // document.getElementById('quiz-form').submit();
+            // Check if the quiz form exists before submitting
+            const quizForm = document.getElementById('quiz-form');
+            if (quizForm) {
+                console.log("Success");
+                saveAnswer();
+                quizForm.submit(); // Auto-submit the form when time's up
+                window.location.href = `/studentInterface.html`;
+            } else {
+                console.error("Quiz form not found!");
+            }
+        }
+    }, 1000); // Updates every second
 }
 
 function createProgressCircles() {
@@ -263,7 +274,7 @@ submitButton.addEventListener("click", (e) => {
     document.getElementById("quiz").style.display = "none"; // Hide the quiz
     // document.getElementById("result").style.display = "block"; // Show the result page
     document.getElementById("progress-container").style.display = "none"; // Hide the progress container
-
+    
     window.location.href = `/studentInterface.html`;
     // Change the frame locations using parent
     // parent.frames['left'].location.href = `/studentSide.html`;
@@ -285,48 +296,48 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Disable right-click and copy-paste
-// document.addEventListener('contextmenu', function (e) {
-//     e.preventDefault();
-//     alert("Right-click is disabled during the exam.");
-// });
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    alert("Right-click is disabled during the exam.");
+});
 
-// document.addEventListener('copy', function (e) {
-//     e.preventDefault();
-//     alert("Copying is not allowed during the exam.");
-// });
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    alert("Copying is not allowed during the exam.");
+});
 
-// document.addEventListener('paste', function (e) {
-//     e.preventDefault();
-//     alert("Pasting is not allowed during the exam.");
-// });
+document.addEventListener('paste', function(e) {
+    e.preventDefault();
+    alert("Pasting is not allowed during the exam.");
+});
 
-// // Detect tab switching (visibility change)
-// document.addEventListener('visibilitychange', function () {
-//     if (document.hidden) {
-//         alert("You switched tabs! This is not allowed during the exam.");
-//     }
-// });
+// Detect tab switching (visibility change)
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        alert("You switched tabs! This is not allowed during the exam.");
+    }
+});
 
 // Disable certain keyboard shortcuts
-// document.addEventListener('keydown', function (event) {
-//     if (event.ctrlKey && event.key === 'c') {
-//         event.preventDefault();
-//         alert("Copying is disabled.");
-//     }
-//     if (event.ctrlKey && event.key === 'v') {
-//         event.preventDefault();
-//         alert("Pasting is disabled.");
-//     }
-//     if (event.ctrlKey && event.key === 't') {
-//         event.preventDefault();
-//         alert("Opening new tabs is not allowed.");
-//     }
-//     if (event.altKey && event.key === 'Tab') {
-//         event.preventDefault();
-//         alert("Switching tabs is not allowed.");
-//     }
-//     if (event.key === 'F12') {
-//         event.preventDefault();
-//         alert("Developer tools are disabled.");
-//     }
-// });
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'c') {
+        event.preventDefault();
+        alert("Copying is disabled.");
+    }
+    if (event.ctrlKey && event.key === 'v') {
+        event.preventDefault();
+        alert("Pasting is disabled.");
+    }
+    if (event.ctrlKey && event.key === 't') {
+        event.preventDefault();
+        alert("Opening new tabs is not allowed.");
+    }
+    if (event.altKey && event.key === 'Tab') {
+        event.preventDefault();
+        alert("Switching tabs is not allowed.");
+    }
+    if (event.key === 'F12') {
+        event.preventDefault();
+        alert("Developer tools are disabled.");
+    }
+});

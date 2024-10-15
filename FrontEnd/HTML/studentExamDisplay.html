@@ -146,8 +146,10 @@
 
         /* Disabled button styles */
         .edit-btn:disabled {
-            background: #d3d3d3 !important; /* Use 'background' instead of 'background-color' */
-            cursor: not-allowed; /* Change cursor to indicate disabled */
+            background: #d3d3d3 !important;
+            /* Use 'background' instead of 'background-color' */
+            cursor: not-allowed;
+            /* Change cursor to indicate disabled */
         }
     </style>
 </head>
@@ -188,7 +190,7 @@
                 }
 
                 const data = await response.json();
-                console.log(data);
+                // console.log(data);
 
                 if (data.success) {
                     examData = data.exams; // Assign fetched data to the data variable
@@ -197,8 +199,18 @@
                         const examDiv = document.createElement('div');
                         examDiv.classList.add('exam-entry');
 
+                        // console.log((new Date(exam.start_date)).toLocaleString());
+                        const dateObject = new Date(exam.start_date);
+                        const localTime = dateObject.toLocaleString();
+
                         // Date and Time Format
-                        const date = exam.start_date.split('T')[0];
+                        // const date = localTime.split('T')[0];
+                        const date = localTime.split(',')[0];
+                        // console.log(date);
+
+                        console.log('Exam Start Date:', date);
+                        console.log('Exam Start Time:', exam.start_time);
+
                         let startTime = exam.start_time;
                         let endTime = exam.end_time;
 
@@ -230,18 +242,32 @@
                                 <button class="edit-btn" myevent="Take" id="takeTest_${exam.examID}" data-exam-id="${exam.examID}" disabled>Take Exam</button>
                             </div>
                         `;
-                        
+
                         examListContainer.appendChild(examDiv);
 
                         // Function to check if the "Take Test" button should be enabled
-                        const examStart = new Date(`${exam.start_date}T${exam.start_time}`);
-                        const examEnd = new Date(`${exam.start_date}T${exam.end_time}`);
+                        // const examStart = new Date(`${exam.start_date}T${exam.start_time}`);
+                        // const examEnd = new Date(`${exam.start_date}T${exam.end_time}`);
+                        // const currentTime = new Date();
+
+                        // Create valid start and end date objects
+                        const examStart = new Date(`${date}T${startTime}:00`); // Add seconds
+                        const examEnd = new Date(`${date}T${endTime}:00`); // Add seconds
                         const currentTime = new Date();
 
-                        if (currentTime >= examStart && currentTime <= examEnd) {
-                            const TestBtn = document.getElementById(`takeTest_${exam.examID}`);
-                            TestBtn.disabled = false;
-                        }
+                        // Check if the dates are valid
+                        // if (isNaN(examStart.getTime()) || isNaN(examEnd.getTime())) {
+                        // console.error('Invalid exam start or end time:', examStart, examEnd);
+                        // return; // Skip this exam if the dates are invalid
+                        // }
+
+                        console.log(examStart);
+                        console.log(examEnd);
+
+                        // if (currentTime >= examStart && currentTime <= examEnd) {
+                        // const TestBtn = document.getElementById(`takeTest_${exam.examID}`);
+                        // TestBtn.disabled = false;
+                        // }
                     });
 
                     // document.getElementById('editModal').style.display = "block";
@@ -261,6 +287,10 @@
             console.log("Hitting");
             // Redirect to the test page or trigger the test-taking process
             window.top.location.href = `/start_exam?examID=${examID}`; // Redirect to the take test page, passing the exam ID
+
+            // const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
+            // Open the test in a new window in full-screen mode
+            // const newWindow = window.open(url, '_blank', 'fullscreen=yes');
         }
 
         // Optionally, you can periodically check the time to enable/disable the button in real-time
@@ -274,29 +304,58 @@
 
                 const examEndTime = exam.end_time; // Same for the end time
 
-                // Create Date objects in local time by combining date and time
-                const examStart = new Date(examStartDate); // Start date already has time
-                examStart.setHours(examStartTime.split(':')[0]); // Set hours
-                examStart.setMinutes(examStartTime.split(':')[1]); // Set minutes
+                // Create a Date object
+                const dateObject = new Date(exam.start_date);
+                const localTime = dateObject.toLocaleString();
+                const date = localTime.split(',')[0];
+                
+                // Split the date part into month, day, and year
+                const [day, month, year] = date.split('/'); // ["10", "14", "2024"]
 
-                const examEnd = new Date(examStartDate); // End date already has time
-                examEnd.setHours(examEndTime.split(':')[0]); // Set hours
-                examEnd.setMinutes(examEndTime.split(':')[1]); // Set minutes
+                console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
+
+                // Extract year, month, and day
+                // const year = dateObject.getUTCFullYear();
+                // const month = String(dateObject.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                // const day = String(dateObject.getUTCDate()).padStart(2, '0');
+
+                // Format into YYYY-MM-DD
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // console.log(formattedDate); // Output: "2024-10-13"
+
+                // console.log(exam.start_date);
+                // console.log(exam.start_time);
+                // console.log(exam.end_time);
+
+                // Create Date objects in local time by combining date and time
+                // const examStart = new Date(examStartDate); // Start date already has time
+                // examStart.setHours(examStartTime.split(':')[0]); // Set hours
+                // examStart.setMinutes(examStartTime.split(':')[1]); // Set minutes
+
+                // const examEnd = new Date(examStartDate); // End date already has time
+                // examEnd.setHours(examEndTime.split(':')[0]); // Set hours
+                // examEnd.setMinutes(examEndTime.split(':')[1]); // Set minutes
 
                 // Check if the current time is within the exam time
                 const takeTestBtn = document.getElementById(`takeTest_${exam.examID}`);
 
-                // console.log("Current Time: ", currentTime);
-                // console.log("Start Time: ", examStart);
-                // console.log("End Time: ", examEnd);
+                // Function to check if the "Take Test" button should be enabled
+                const examStart = new Date(`${formattedDate}T${exam.start_time}`);
+                const examEnd = new Date(`${formattedDate}T${exam.end_time}`);
+                const currentTime = new Date();
+
+                console.log("Current Time: ", currentTime);
+                console.log("Start Time: ", examStart);
+                console.log("End Time: ", examEnd);
 
                 // Enable or disable the test button based on the time comparison
                 if (currentTime >= examStart && currentTime <= examEnd) {
                     takeTestBtn.disabled = false; // Enable the button if within the time range
                     takeTestBtn.addEventListener('click', () => {
-                            console.log("In Action LIstener");
-                            startTest(exam.examID); // Call the function to start the test
-                        });
+                        console.log("In Action LIstener");
+                        startTest(exam.examID); // Call the function to start the test
+                    });
                 } else {
                     takeTestBtn.disabled = true; // Disable otherwise
                 }
