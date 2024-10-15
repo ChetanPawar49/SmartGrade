@@ -173,6 +173,16 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             fetchExams();
+
+            // Add a global event listener for the exam buttons
+            const examListContainer = document.getElementById('examListContainer');
+            examListContainer.addEventListener('click', (event) => {
+                // Check if the clicked element is a Take Exam button
+                if (event.target.classList.contains('edit-btn')) {
+                    const examID = event.target.getAttribute('data-exam-id');
+                    startTest(examID); // Call the function to start the test
+                }
+            });
         });
 
         // Function to fetch exams from the backend and populate the form
@@ -208,8 +218,8 @@
                         const date = localTime.split(',')[0];
                         // console.log(date);
 
-                        console.log('Exam Start Date:', date);
-                        console.log('Exam Start Time:', exam.start_time);
+                        // console.log('Exam Start Date:', date);
+                        // console.log('Exam Start Time:', exam.start_time);
 
                         let startTime = exam.start_time;
                         let endTime = exam.end_time;
@@ -261,8 +271,8 @@
                         // return; // Skip this exam if the dates are invalid
                         // }
 
-                        console.log(examStart);
-                        console.log(examEnd);
+                        // console.log(examStart);
+                        // console.log(examEnd);
 
                         // if (currentTime >= examStart && currentTime <= examEnd) {
                         // const TestBtn = document.getElementById(`takeTest_${exam.examID}`);
@@ -282,11 +292,46 @@
             }
         }
 
+        // Check the student's attempt status
+        async function checkExamStatus(examID) {
+            try {
+                const response = await fetch(`/checkExamStatus/${examID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.status === 'Completed') {
+                        // If exam is already completed, show alert and disable button
+                        console.log("Unsuccessful");
+                        alert('You can only take the exam once. Your exam has already been completed.');
+                        // const takeTestBtn = document.getElementById(`takeTest_${examID}`);
+                        // takeTestBtn.disabled = true;
+                    } else if (data.status === 'pending') {
+                        // If exam is pending, allow the student to start the exam
+                        const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
+                        // Open the test in a new window in full-screen mode
+                        const newWindow = window.open(url, '_blank', 'fullscreen=yes');
+                    }
+                } else {
+                    console.error('Error checking exam status:', data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error checking exam status.');
+            }
+        }
+
         // Function to handle starting the test
         function startTest(examID) {
             console.log("Hitting");
+            checkExamStatus(examID);
             // Redirect to the test page or trigger the test-taking process
-            window.top.location.href = `/start_exam?examID=${examID}`; // Redirect to the take test page, passing the exam ID
+            // window.top.location.href = `/start_exam?examID=${examID}`; // Redirect to the take test page, passing the exam ID
 
             // const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
             // Open the test in a new window in full-screen mode
@@ -308,11 +353,11 @@
                 const dateObject = new Date(exam.start_date);
                 const localTime = dateObject.toLocaleString();
                 const date = localTime.split(',')[0];
-                
+
                 // Split the date part into month, day, and year
                 const [day, month, year] = date.split('/'); // ["10", "14", "2024"]
 
-                console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
+                // console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
 
                 // Extract year, month, and day
                 // const year = dateObject.getUTCFullYear();
@@ -345,17 +390,17 @@
                 const examEnd = new Date(`${formattedDate}T${exam.end_time}`);
                 const currentTime = new Date();
 
-                console.log("Current Time: ", currentTime);
-                console.log("Start Time: ", examStart);
-                console.log("End Time: ", examEnd);
+                // console.log("Current Time: ", currentTime);
+                // console.log("Start Time: ", examStart);
+                // console.log("End Time: ", examEnd);
 
                 // Enable or disable the test button based on the time comparison
                 if (currentTime >= examStart && currentTime <= examEnd) {
                     takeTestBtn.disabled = false; // Enable the button if within the time range
-                    takeTestBtn.addEventListener('click', () => {
-                        console.log("In Action LIstener");
-                        startTest(exam.examID); // Call the function to start the test
-                    });
+                    // takeTestBtn.addEventListener('click', () => {
+                    // console.log("In Action LIstener");
+                    // startTest(exam.examID); // Call the function to start the test
+                    // });
                 } else {
                     takeTestBtn.disabled = true; // Disable otherwise
                 }

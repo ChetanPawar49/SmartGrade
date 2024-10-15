@@ -154,7 +154,6 @@ function displayQuestion(index) {
         optionsContainer.appendChild(document.createElement("br"));
     });
 
-
     // Disable the previous button if it's the first question
     prevButton.disabled = index === 0;
 
@@ -264,7 +263,8 @@ submitButton.addEventListener("click", (e) => {
     // document.getElementById("result").style.display = "block"; // Show the result page
     document.getElementById("progress-container").style.display = "none"; // Hide the progress container
 
-    window.location.href = `/studentInterface.html`;
+    window.close();
+    window.location.href = `/studentResult.html`;
     // Change the frame locations using parent
     // parent.frames['left'].location.href = `/studentSide.html`;
     // parent.frames['right'].location.href = `/studentExamDisplay.html`;
@@ -285,48 +285,48 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Disable right-click and copy-paste
-// document.addEventListener('contextmenu', function (e) {
-//     e.preventDefault();
-//     alert("Right-click is disabled during the exam.");
-// });
+document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    alert("Right-click is disabled during the exam.");
+});
 
-// document.addEventListener('copy', function (e) {
-//     e.preventDefault();
-//     alert("Copying is not allowed during the exam.");
-// });
+document.addEventListener('copy', function (e) {
+    e.preventDefault();
+    alert("Copying is not allowed during the exam.");
+});
 
-// document.addEventListener('paste', function (e) {
-//     e.preventDefault();
-//     alert("Pasting is not allowed during the exam.");
-// });
+document.addEventListener('paste', function (e) {
+    e.preventDefault();
+    alert("Pasting is not allowed during the exam.");
+});
 
-// // Detect tab switching (visibility change)
-// document.addEventListener('visibilitychange', function () {
-//     if (document.hidden) {
-//         alert("You switched tabs! This is not allowed during the exam.");
-//     }
-// });
+// Detect tab switching (visibility change)
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+        alert("You switched tabs! This is not allowed during the exam.");
+    }
+});
 
 // Disable certain keyboard shortcuts
-// document.addEventListener('keydown', function (event) {
-//     if (event.ctrlKey && event.key === 'c') {
-//         event.preventDefault();
-//         alert("Copying is disabled.");
-//     }
-//     if (event.ctrlKey && event.key === 'v') {
-//         event.preventDefault();
-//         alert("Pasting is disabled.");
-//     }
-//     if (event.ctrlKey && event.key === 't') {
-//         event.preventDefault();
-//         alert("Opening new tabs is not allowed.");
-//     }
-//     if (event.altKey && event.key === 'Tab') {
-//         event.preventDefault();
-//         alert("Switching tabs is not allowed.");
-//     }
-//     if (event.key === 'F12') {
-//         event.preventDefault();
-//         alert("Developer tools are disabled.");
-//     }
-// });
+document.addEventListener('keydown', function (event) {
+    if (event.ctrlKey && event.key === 'c') {
+        event.preventDefault();
+        alert("Copying is disabled.");
+    }
+    if (event.ctrlKey && event.key === 'v') {
+        event.preventDefault();
+        alert("Pasting is disabled.");
+    }
+    if (event.ctrlKey && event.key === 't') {
+        event.preventDefault();
+        alert("Opening new tabs is not allowed.");
+    }
+    if (event.altKey && event.key === 'Tab') {
+        event.preventDefault();
+        alert("Switching tabs is not allowed.");
+    }
+    if (event.key === 'F12') {
+        event.preventDefault();
+        alert("Developer tools are disabled.");
+    }
+});

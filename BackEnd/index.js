@@ -931,6 +931,36 @@ app.post('/get-questions', async (req, res) => {
     }
 });
 
+// Assuming you have a route to check exam status
+app.get('/checkExamStatus/:examID', async (req, res) => {
+    const { examID } = req.params;
+    const userID = req.session.userID;  // Assuming you're using authentication to get the user's ID
+    let connection;
+
+    try {
+        connection = await pool.getConnection();
+        // Query your database to get the attempt status for the exam and student
+        const result = await connection.query(`SELECT status FROM Attempt_Master WHERE examID = ? AND applicationID = ?`, [examID, userID]);
+
+        // console.log(result);
+        // console.log(result[0].status);
+        // console.log(result[0]);
+        console.log(result[0][0].status);
+
+        if (result.length > 0) {
+            // Access the first status value
+            const status = result[0][0].status; // Get the status from the first object in the first array
+            res.json({ success: true, status: status });
+        } else {
+            // No attempt found, status is pending
+            res.json({ success: true, status: 'pending' });
+        }
+    } catch (error) {
+        console.error('Error checking exam status:', error);
+        res.json({ success: false, message: 'Error checking exam status.' });
+    }
+});
+
 //Insert Into Attempts:
 app.post('/InsertAttempt', async (req, res) => {
     const { questionId, sel_answer } = req.body;
