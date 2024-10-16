@@ -412,9 +412,22 @@ app.post('/logout', (req, res) => {
 
 app.get('/exam-schedule', checkAuth, async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT examID, name, start_date, start_time, end_time, total_marks, passing_marks FROM exam_master WHERE start_date = CURDATE()');
+        // const [rows] = await pool.query('SELECT examID, name, start_date, start_time, end_time, total_marks, passing_marks FROM exam_master WHERE start_date = CURDATE()');
+        // const [rows] = await pool.query(`SELECT examID, name, start_date, start_time, end_time, total_marks, passing_marks FROM exam_master WHERE DATE(start_date) = DATE(NOW()); `);
+        const [rows] = await pool.query(`
+            SELECT examID, 
+                   name, 
+                   CONVERT_TZ(start_date, '+00:00', '+05:30') AS start_date, 
+                   start_time, 
+                   end_time, 
+                   total_marks, 
+                   passing_marks 
+            FROM exam_master 
+            WHERE DATE(CONVERT_TZ(start_date, '+00:00', '+05:30')) = DATE(CONVERT_TZ(NOW(), '+00:00', '+05:30'));
+        `);        
 
         if (rows.length > 0) {
+            console.log(rows);
             res.json(rows); // Send today's exam data as JSON
         } else {
             res.status(404).json({ message: 'No exams scheduled for today' });

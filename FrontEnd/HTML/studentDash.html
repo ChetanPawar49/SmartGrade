@@ -153,6 +153,7 @@
                         examData.forEach(exam => {
                             // Date and Time Format
                             const date = exam.start_date.split('T')[0];
+                            console.log(date);
                             let time = exam.start_time;
                             let [hours, minutes] = time.split(':'); // Split the time string into hours and minutes
                             hours = parseInt(hours); // Convert the hours to an integer
