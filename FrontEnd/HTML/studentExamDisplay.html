@@ -312,8 +312,11 @@
                         // const takeTestBtn = document.getElementById(`takeTest_${examID}`);
                         // takeTestBtn.disabled = true;
                     } else if (data.status === 'pending') {
+                        // window.top.location.href = `/start_exam?examID=${examID}`;
+
                         // If exam is pending, allow the student to start the exam
                         const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
+                        
                         // Open the test in a new window in full-screen mode
                         const newWindow = window.open(url, '_blank', 'fullscreen=yes');
                     }

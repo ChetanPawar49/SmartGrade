@@ -1002,7 +1002,12 @@ app.post('/get-questions', async (req, res) => {
         }));
 
         // Send the formatted questions array back to the frontend
-        res.json({ examId, questions: questionsArray });
+        // Return the examId, questions, and end_time in the response
+        res.json({ 
+            examId, 
+            questions: questionsArray, 
+            end_time: results[0].end_time // Use the end_time from the first row
+        });
     } catch (err) {
         console.error('Error fetching questions:', err);
         return res.status(500).json({ message: 'Server error' });
@@ -1022,17 +1027,18 @@ app.get('/checkExamStatus/:examID', async (req, res) => {
         // Query your database to get the attempt status for the exam and student
         const result = await connection.query(`SELECT status FROM Attempt_Master WHERE examID = ? AND applicationID = ?`, [examID, userID]);
 
-        // console.log(result);
+        console.log("result Length: ", result[0].length);
         // console.log(result[0].status);
         // console.log(result[0]);
-        console.log(result[0][0].status);
+        // console.log(result[0][0].status);
 
-        if (result.length > 0) {
+        if (result[0].length > 0) {
             // Access the first status value
             const status = result[0][0].status; // Get the status from the first object in the first array
             res.json({ success: true, status: status });
         } else {
             // No attempt found, status is pending
+            console.log("Inside Pending");
             res.json({ success: true, status: 'pending' });
         }
     } catch (error) {

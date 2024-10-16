@@ -22,36 +22,6 @@ CREATE TABLE `User_Master` (
   `timestamp` timestamp NOT NULL
 );
 
-CREATE TABLE `Teacher` (
-  `teacherId` int UNIQUE PRIMARY KEY NOT NULL,
-  `userID` int NOT NULL,
-  `timestamp` timestamp NOT NULL
-);
-
-CREATE TABLE `Student` (
-  `applicationID` int UNIQUE PRIMARY KEY NOT NULL,
-  `userID` int NOT NULL,
-  `examID` int UNIQUE NOT NULL,
-  `appstatus` enum('Pending', 'Active', 'Inactive') NOT NULL,
-  `attendance` enum('Pending', 'Present', 'Absent') NOT NULL,
-  `marks` int NOT NULL,
-  `timestamp` timestamp NOT NULL
-);
-
--- CREATE TABLE `Exam_Master` (
---   `examID` int UNIQUE PRIMARY KEY NOT NULL,
---   `name` varchar(15) NOT NULL,
---   `app_start_date` date NOT NULL,
---   `app_end_date` date NOT NULL,
---   `exam_start_time` time NOT NULL,
---   `exam_end_date` date NOT NULL,
---   `exam_end_time` time NOT NULL,
---   `total_marks` int NOT NULL,
---   `passing_marks` int NOT NULL,
---   `status` enum('Pending', 'Completed') NOT NULL,
---   `timestamp` timestamp NOT NULL
--- );
-
 CREATE TABLE `Exam_Master` (
 	`examID` int NOT NULL UNIQUE AUTO_INCREMENT,
     `teacherId` int NOT NULL,
@@ -103,6 +73,10 @@ ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master`
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question_Master` (`questionID`);
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `User_Master` (`userID`);
+
+-- SELECT name FROM mysql.time_zone_name WHERE name LIKE 'Asia%';
+
+SET time_zone = 'Asia/Kolkata';
 
 SHOW TABLES;
 

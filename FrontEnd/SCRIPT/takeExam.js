@@ -11,7 +11,7 @@ const prevButton = document.getElementById("prev-button");
 const nextButton = document.getElementById("next-button");
 const saveButton = document.getElementById("save-button");
 const submitButton = document.getElementById("submit-button");
-const display = document.getElementById('time-left');
+const timerDisplay = document.getElementById('time-left');
 const progressBar = document.getElementById('timer-bar');
 
 // Fetch questions from backend
@@ -45,6 +45,8 @@ async function fetchQuestions() {
 
         // Start the timer using the exam end time
         // startTimer(totalDuration, display, progressBar);
+        console.log(data);
+        console.log("End Time: " ,data.end_time);
         startTimer(data.end_time);
     } catch (error) {
         console.error('Error fetching questions:', error);
@@ -215,7 +217,7 @@ function saveAnswer() {
             .catch((error) => {
                 console.error('Error:', error);
                 // Handle the error response
-                alert('Error submitting attempt. Please try again.');
+                // alert('Error submitting attempt. Please try again.');
             });
 
     } else {
