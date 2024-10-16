@@ -779,7 +779,7 @@ app.post('/api/exams/myexam', async (req, res) => {
 
 //to Update Exam:
 app.post('/updateExam', async (req, res) => {
-    const { examID, name, exam_start_date, exam_start_time, exam_end_time, total_marks, passing_marks } = req.body;
+    const { examID, name, exam_start_date, exam_start_time, exam_end_time, passing_marks } = req.body;
 
     let connection;
     console.log("teacherID: " + req.session.userID);
@@ -788,11 +788,33 @@ app.post('/updateExam', async (req, res) => {
         // Get the connection asynchronously
         connection = await pool.getConnection();
 
+        // First, fetch the total marks for validation
+        const [rows] = await connection.execute(`SELECT total_marks FROM exam_master WHERE examID = ? AND teacherId = ?`, [examID, req.session.userID]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "Exam not found or not authorized to update" });
+        }
+
+        const total_marks = rows[0].total_marks;
+
+        // Validate passing_marks
+        if (passing_marks >= total_marks) {
+            return res.status(400).json({ success: false, message: "Passing marks cannot exceed total marks." });
+        }
+
         // Prepare the SQL query for updating exam_master
-        const sql = 'UPDATE exam_master SET name = ?, start_date = ?, start_time = ?, end_time = ?, total_marks = ?, passing_marks = ?, timestamp = ? WHERE examID = ? AND teacherId=?';
+        const sql = `UPDATE exam_master 
+                    SET name = ?, 
+                        start_date = ?, 
+                        start_time = ?, 
+                        end_time = ?, 
+                        passing_marks = ?, 
+                        timestamp = ? 
+                    WHERE examID = ? 
+                    AND teacherId = ?`;
 
         // Execute the query and update the data in the database
-        const [result] = await connection.execute(sql, [name, exam_start_date, exam_start_time, exam_end_time, total_marks, passing_marks, new Date(), examID, req.session.userID]);
+        const [result] = await connection.execute(sql, [name, exam_start_date, exam_start_time, exam_end_time, passing_marks, new Date(), examID, req.session.userID]);
 
         // Check if any rows were updated
         if (result.affectedRows === 0) {
@@ -801,7 +823,7 @@ app.post('/updateExam', async (req, res) => {
 
         console.log("Exam updated successfully, Exam ID: " + examID);
 
-        // Respond with success (you can modify this based on your application's needs)
+        // Respond with success
         res.json({
             success: true,
             message: "Exam updated successfully",
@@ -838,13 +860,14 @@ app.post('/delExam', async (req, res) => {
 app.post('/updateQuestion', async (req, res) => {
     const { examID, questionId, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks } = req.body
     // const examID = req.session.examID;
-    console.log(examID);
+    // console.log(examID);
     let connection;
-    console.log(correctOption);
+    // console.log(correctOption);
     // Modified query to fetch questions and their corresponding options from question_master
     const query = `select * from question_master where questionID=?;`;
     const ins_query = `Insert Into question_master(examID,question,optionA,optionB,optionC,optionD,answer_key,question_marks) values(?,?,?,?,?,?,?,?);`;
     const update_query = `UPDATE question_master set question=?,optionA=?,optionB=?,optionC=?,optionD=?,answer_key=?,question_marks=? where questionID=?`;
+    const exam_query = `SELECT SUM(question_marks) FROM question_master WHERE examID=?`;
     try {
         // Fetch questions and options from the database
         connection = await pool.getConnection();
@@ -853,10 +876,12 @@ app.post('/updateQuestion', async (req, res) => {
 
         if (results.length === 0) {
             //return res.status(404).json({ message: 'No questions found for this exam.' });
-            const [ins_result] = await connection.query(ins_query, [examID, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks]);;
+            const [ins_result] = await connection.query(ins_query, [examID, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks]);
+            const [exam_result] = await connection.query(exam_query, [examID]);
 
         } else {
             const [update_result] = await connection.query(update_query, [updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks, questionId]);
+            // console.log(update_total);
         }
         res.status(200).json({ message: "Success" });
     } catch (err) {
@@ -866,6 +891,48 @@ app.post('/updateQuestion', async (req, res) => {
         if (connection) connection.release(); // Release the database connection
     }
 });
+
+app.post('/updateTotal', async (req, res) => {
+    const { examID, questionID } = req.body; // Destructured variables with correct names
+
+    let connection;
+    
+    // Queries
+    const query = `SELECT * FROM question_master WHERE questionID = ?;`; // Use questionID from req.body
+    const exam_query = `SELECT SUM(question_marks) AS total FROM question_master WHERE examID = ?;`;
+    
+    try {
+        // Get a connection from the pool
+        connection = await pool.getConnection();
+
+        // Use the correct variable questionID
+        const [results] = await connection.query(query, [questionID]); // Changed questionId to questionID
+
+        // if (results.length === 0) {
+            // console.log("Nothing found for the provided questionID");
+        // } else {
+            // Update existing question
+            // const [update_total] = await connection.query(exam_query, [examID]);
+        // }
+
+        // Calculate total marks for the exam after the update/insert operation
+        const [totalMarksResult] = await connection.query(exam_query, [examID]);
+        console.log(results);
+        // console.log(totalMarksResult);
+        // console.log(totalMarksResult[0].total);
+
+        // Update total_marks in the exam_master table
+        await connection.query(`UPDATE exam_master SET total_marks = ? WHERE examID = ?;`, [totalMarksResult[0].total, examID]);
+
+        res.status(200).json({ message: "Success" });
+    } catch (err) {
+        console.error('Error updating total marks:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
+});
+
 
 // Start Exam
 app.get('/start_exam', (req, res) => {
@@ -998,11 +1065,12 @@ app.post('/get-my-questions', async (req, res) => {
     const { examId } = req.body;
     // const examId = req.examId; // examId comes from URL params
     // const examId = req.session.examID;
-    // console.log(examId);
+    console.log(examId);
     let connection;
 
     // Modified query to fetch questions and their corresponding options from question_master
-    const query = `select q.questionID, q.question, q.optionA, q.optionB, q.optionC, q.optionD, e.start_time,e.end_time, q.question_marks from question_master q join exam_master e on e.examID=?;`;
+    // const query = `select q.questionID, q.question, q.optionA, q.optionB, q.optionC, q.optionD, e.start_time, e.end_time, q.question_marks from question_master q join exam_master e on e.examID=?;`;
+    const query = `select questionID, question, optionA, optionB, optionC, optionD, question_marks from question_master where examID=?;`;
 
     try {
         // Fetch questions and options from the database

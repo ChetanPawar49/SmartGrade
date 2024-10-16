@@ -59,10 +59,10 @@
                             <span class="details">Exam End Time</span>
                             <input type="time" id="edit_end_time" name="end_time" required>
                         </div>
-                        <div class="input-box">
+                        <!-- <div class="input-box">
                             <span class="details">Total Marks</span>
                             <input type="number" id="edit_total_marks" name="total_marks" required>
-                        </div>
+                        </div> -->
                         <div class="input-box">
                             <span class="details">Passing Marks</span>
                             <input type="number" id="edit_passing_marks" name="passing_marks" required>
@@ -91,6 +91,7 @@
         // Add an event listener for the button click
         editQuesButton.addEventListener('click', async function () {
             const examId = currentExamID;
+            console.log("exam id: ", examId);
             try {
                 // Fetch questions from the backend
                 const response = await fetch(`http://localhost:3000/get-my-questions`, {
@@ -224,6 +225,20 @@
                         if (updateResponse.ok) {
                             alert('Question updated successfully!');
                             // Optionally, refresh the question list
+                            const updateTotalMarks = {
+                                examId: examId,
+                                questionId: question.id
+                            };
+                            console.log("Current Exam ID: ", examId);
+                            console.log(updateTotalMarks);
+
+                            const updateTotal = await fetch('/updateTotal', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(updateTotalMarks)
+                            });
                         } else {
                             alert('Failed to update question');
                         }
@@ -493,7 +508,7 @@
                     document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
                     document.getElementById('edit_start_time').value = exam.start_time || '';
                     document.getElementById('edit_end_time').value = exam.end_time || '';
-                    document.getElementById('edit_total_marks').value = exam.total_marks || '';
+                    // document.getElementById('edit_total_marks').value = exam.total_marks || '';
                     document.getElementById('edit_passing_marks').value = exam.passing_marks || '';
 
                     // Show the modal
@@ -526,7 +541,7 @@
                 exam_start_date: document.getElementById('edit_start_date').value,
                 exam_start_time: document.getElementById('edit_start_time').value,
                 exam_end_time: document.getElementById('edit_end_time').value,
-                total_marks: document.getElementById('edit_total_marks').value,
+                // total_marks: document.getElementById('edit_total_marks').value,
                 passing_marks: document.getElementById('edit_passing_marks').value,
             };
 

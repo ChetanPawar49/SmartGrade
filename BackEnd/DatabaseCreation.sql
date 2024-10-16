@@ -85,6 +85,7 @@ CREATE TABLE `Attempt_Master` (
   `questionID` int NOT NULL,
   `applicationID` int NOT NULL,
   `selected_option` enum('optionA', 'optionB', 'optionC', 'optionD') NOT NULL,
+  `status` ENUM('Pending','Completed') NOT NULL DEFAULT 'Pending',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (examID, questionID, applicationID)
 );
@@ -95,12 +96,6 @@ CREATE TABLE notices (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE `Teacher` ADD FOREIGN KEY (`userID`) REFERENCES `User_Master` (`userID`);
-
-ALTER TABLE `Student` ADD FOREIGN KEY (`userID`) REFERENCES `User_Master` (`userID`);
-
-ALTER TABLE `Student` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
-
 ALTER TABLE `Question_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master` (`examID`);
@@ -108,34 +103,6 @@ ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Exam_Master`
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`questionID`) REFERENCES `Question_Master` (`questionID`);
 
 ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `User_Master` (`userID`);
-
--- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY `examID`;
--- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY questionID;
--- ALTER TABLE `Attempt_Master` DROP FOREIGN KEY applicationID;
--- ALTER TABLE `Question_Master` DROP FOREIGN KEY `examID`;
-
--- ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`examID`) REFERENCES `Student` (`examID`);
-
--- ALTER TABLE `Attempt_Master` ADD FOREIGN KEY (`applicationID`) REFERENCES `Student` (`applicationID`);
-
-SELECT * FROM user_master;
-SELECT * FROM question_master;
-SELECT * FROM exam_master;
-select * from Attempt_Master;
-select * from notices;
-
-drop table exam_master;
-drop table question_master;
-drop table Attempt_Master;
-
-truncate question_master;
-truncate exam_master;
-truncate Attempt_Master;
-truncate notices;
-
-SHOW CREATE TABLE `Question_Master`;
-
--- alter table question_master drop timestamp;
 
 SHOW TABLES;
 
@@ -155,8 +122,8 @@ INSERT INTO `User_Master` (`username`, `password`, `firstname`, `lastname`, `use
 ('aishwaryag', 'pass890', 'Aishwarya', 'Gawande', 'Student', '9876543217', 'aishwarya.gawande@example.com', 'Pending', CURRENT_TIMESTAMP);
 
 INSERT INTO `Exam_Master` (`examID`, `teacherId`, `name`, `start_date`, `start_time`, `end_time`, `total_marks`, `passing_marks`, `timestamp`) VALUES
-(1, 1, 'Math Exam', '2024-10-20', '10:00:00', '12:00:00', 100, 35, CURRENT_TIMESTAMP),
-(2, 2, 'Science Exam', '2024-10-22', '11:00:00', '13:00:00', 100, 40, CURRENT_TIMESTAMP),
+(1, 3, 'Math Exam', '2024-10-20', '10:00:00', '12:00:00', 100, 35, CURRENT_TIMESTAMP),
+(2, 3, 'Science Exam', '2024-10-22', '11:00:00', '13:00:00', 100, 40, CURRENT_TIMESTAMP),
 (3, 3, 'English Exam', '2024-10-25', '09:00:00', '11:00:00', 100, 45, CURRENT_TIMESTAMP);
 
 INSERT INTO `Question_Master` (`questionID`, `examID`, `question`, `optionA`, `optionB`, `optionC`, `optionD`, `answer_key`, `question_marks`, `timestamp`) VALUES
