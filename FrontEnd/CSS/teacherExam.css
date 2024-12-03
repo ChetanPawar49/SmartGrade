@@ -31,6 +31,7 @@ body {
 
 #examTable th {
     background-color: #4CAF50;
+    /* background-color: #5567DD; */
     color: white;
     padding: 12px;
     text-align: left;
@@ -153,9 +154,26 @@ button:hover {
     border-radius: 5px;
     border: none;
     margin-top: 20px;
+    margin-right: 15px;
 }
 
 .modal input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#Addques, #edit_ques {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    margin-top: 20px;
+    margin-right: 15px;
+}
+
+#Addques:hover, #edit_ques:hover {
     background-color: #45a049;
 }
 

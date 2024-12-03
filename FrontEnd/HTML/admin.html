@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin.css">
@@ -16,13 +21,13 @@
         <a href="#organizers" data-target="organizer-section">Teachers</a>
         <!-- <a href="#organizers" data-target="organizer-section">Organizers</a> -->
         <!-- <a href="#organizations" data-target="organizations-section">Organizations</a> -->
-        <a href="#exams" data-target="exams-section">Exams</a>
+        <!-- <a href="#exams" data-target="exams-section">Exams</a> -->
         <!-- <a href="#applications" data-target="applications-section">Applications</a> -->
-        <a href="#questions" data-target="questions-section">Questions</a>
-        <a href="#attempts" data-target="attempts-section">Attempts</a>
+        <!-- <a href="#questions" data-target="questions-section">Questions</a>
+        <a href="#attempts" data-target="attempts-section">Attempts</a> -->
         <!-- <a href="#transactions" data-target="transactions-section">Transactions</a> -->
-        <a href="#settings">Settings</a>
-        <a href="#reports">Reports</a>
+        <!-- <a href="#settings">Settings</a>
+        <a href="#reports">Reports</a> -->
         <a href="#logout" data-target="logout-section">Logout</a>
     </div>
 
@@ -240,8 +245,8 @@
                         <td>${item.usertype || ''}</td>
                         <td>
                             <select class="form-control status-select" data-id="${item.id}">
-                                <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
                                 <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
                             </select>
                         </td>
                         <td><button class="btn btn-primary update-status-btn" data-id="${item.id}">Update Status</button></td>
@@ -305,9 +310,9 @@
     // Initial Fetch and populate data for each table
     fetchData('/student', 'applicant-table');
     fetchData('/teacher', 'organizer-table');
-    fetchData('/exam', 'exams-table');
-    fetchData('/question', 'questions-table');
-    fetchData('/attempt', 'attempts-table');
+    // fetchData('/exam', 'exams-table');
+    // fetchData('/question', 'questions-table');
+    // fetchData('/attempt', 'attempts-table');
 });
         // Logout function
         function logout() {

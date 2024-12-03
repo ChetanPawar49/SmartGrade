@@ -9,7 +9,8 @@ body {
     /* background: #472001; */
     /* background: #4f5fc7; */
     /*linear-gradient(to right, #24b3c1, #34e89e);*/
-    background: linear-gradient(to right, #4348cc, #5746a1);
+    /* background: linear-gradient(to right, #4348cc, #5746a1); */
+    background: linear-gradient(to right, #5746a1, #4348cc);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -37,7 +38,7 @@ body {
 
 .logo-top img {
     max-width: 250px;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
     text-align: center;
     /*border-radius: 0%;*/
    /* animation: bounce 2s infinite;*/

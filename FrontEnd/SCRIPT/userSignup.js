@@ -11,11 +11,29 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Form submit event triggered'); // Log when the event is triggered
         event.preventDefault(); // Prevent the default form submission
 
+        const email = document.getElementById('mail').value;
+        const emailError = document.getElementById('emailError');
+
+        // Clear any previous error messages
+        // if (emailError) {
+        //     emailError.textContent = '';
+        // }
+
+        // Validate email ends with @gmail.com
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!gmailRegex.test(email)) {
+            // if (emailError) {
+            //     emailError.textContent = 'Email must end with @gmail.com.';
+            // }
+            alert("Email must end with @gmail.com");
+            return; // Stop form submission
+        }
+
         // Extract form values into separate variables
 
         const firstName = document.getElementById('fname').value;
         const lastName = document.getElementById('lname').value;
-        const email = document.getElementById('mail').value;
+        // const email = document.getElementById('mail').value;
         const phoneNumber = document.getElementById('mobileno').value;
         const username = document.getElementById('username').value;
         const password = document.getElementById('pass').value;

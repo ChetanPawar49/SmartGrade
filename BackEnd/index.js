@@ -360,7 +360,8 @@ app.get('/teacher', async (req, res) => {
 
 app.get('/exam', async (req, res) => {
     try {
-        const [results] = await pool.query('SELECT examID AS id, name, app_start_date, app_end_date FROM Exam_Master');
+        // one change
+        const [results] = await pool.query('SELECT examID AS id, name, start_date FROM Exam_Master');
         res.json(results);
     } catch (err) {
         console.error('Error fetching exams data:', err);
@@ -380,7 +381,8 @@ app.get('/question', async (req, res) => {
 
 app.get('/attempt', async (req, res) => {
     try {
-        const [results] = await pool.query('SELECT attemptID AS id, examID, questionID, applicationID, selected_option, correct_option, marks_obt, status FROM Attempt_Master');
+        // one change
+        const [results] = await pool.query('SELECT attemptID AS id, examID, questionID, applicationID, selected_option FROM Attempt_Master');
         res.json(results);
     } catch (err) {
         console.error('Error fetching attempts data:', err);
@@ -424,7 +426,7 @@ app.get('/exam-schedule', checkAuth, async (req, res) => {
                    passing_marks 
             FROM exam_master 
             WHERE DATE(CONVERT_TZ(start_date, '+00:00', '+05:30')) = DATE(CONVERT_TZ(NOW(), '+00:00', '+05:30'));
-        `);        
+        `);
 
         if (rows.length > 0) {
             console.log(rows);
@@ -880,7 +882,8 @@ app.post('/updateQuestion', async (req, res) => {
     const query = `select * from question_master where questionID=?;`;
     const ins_query = `Insert Into question_master(examID,question,optionA,optionB,optionC,optionD,answer_key,question_marks) values(?,?,?,?,?,?,?,?);`;
     const update_query = `UPDATE question_master set question=?,optionA=?,optionB=?,optionC=?,optionD=?,answer_key=?,question_marks=? where questionID=?`;
-    const exam_query = `SELECT SUM(question_marks) FROM question_master WHERE examID=?`;
+    const exam_query = `SELECT SUM(question_marks) as sum FROM question_master WHERE examID=?`;
+    const total_query = `UPDATE exam_master SET total_marks=? WHERE examID=?`;
     try {
         // Fetch questions and options from the database
         connection = await pool.getConnection();
@@ -891,7 +894,8 @@ app.post('/updateQuestion', async (req, res) => {
             //return res.status(404).json({ message: 'No questions found for this exam.' });
             const [ins_result] = await connection.query(ins_query, [examID, updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks]);
             const [exam_result] = await connection.query(exam_query, [examID]);
-
+            const [total_result] = await connection.query(total_query, [exam_result[0].sum, examID]);
+            // console.log("Exam Query: ", exam_result);
         } else {
             const [update_result] = await connection.query(update_query, [updatedQuestion, optionA, optionB, optionC, optionD, correctOption, totalMarks, questionId]);
             // console.log(update_total);
@@ -909,11 +913,11 @@ app.post('/updateTotal', async (req, res) => {
     const { examID, questionID } = req.body; // Destructured variables with correct names
 
     let connection;
-    
+
     // Queries
     const query = `SELECT * FROM question_master WHERE questionID = ?;`; // Use questionID from req.body
     const exam_query = `SELECT SUM(question_marks) AS total FROM question_master WHERE examID = ?;`;
-    
+
     try {
         // Get a connection from the pool
         connection = await pool.getConnection();
@@ -922,10 +926,10 @@ app.post('/updateTotal', async (req, res) => {
         const [results] = await connection.query(query, [questionID]); // Changed questionId to questionID
 
         // if (results.length === 0) {
-            // console.log("Nothing found for the provided questionID");
+        // console.log("Nothing found for the provided questionID");
         // } else {
-            // Update existing question
-            // const [update_total] = await connection.query(exam_query, [examID]);
+        // Update existing question
+        // const [update_total] = await connection.query(exam_query, [examID]);
         // }
 
         // Calculate total marks for the exam after the update/insert operation
@@ -946,6 +950,44 @@ app.post('/updateTotal', async (req, res) => {
     }
 });
 
+// Delete Questions API
+app.post('/deleteQuestion', async (req, res) => {
+    const { questionId } = req.body;
+
+    let connection;
+
+    // Queries
+    const questionMarksQuery = 'SELECT question_marks FROM question_master WHERE questionID = ?';
+    const deleteQuery = 'DELETE FROM question_master WHERE questionID = ?';
+    const updateTotalQuery = 'UPDATE exam_master SET total_marks = total_marks - ? WHERE examID = (SELECT examID FROM question_master WHERE questionID = ?)';
+
+    try {
+        // Fetch questions and options from the database
+        connection = await pool.getConnection();
+
+        // Get the question marks of the question to be deleted
+        const [result1] = await connection.query(questionMarksQuery, [questionId]);
+
+        if (result1.length > 0) {
+            const questionMarks = result1[0].question_marks; // Retrieve the question marks
+
+            // Update the total marks in the exam_master table
+            await connection.query(updateTotalQuery, [questionMarks, questionId]);
+
+            // Delete the question
+            await connection.query(deleteQuery, [questionId]);
+
+            res.status(200).json({ message: "Question deleted successfully and total marks updated." });
+        } else {
+            res.status(404).json({ message: "Question not found." });
+        }
+    } catch (err) {
+        console.error('Error deleting question:', err);
+        return res.status(500).json({ message: 'Server error' });
+    } finally {
+        if (connection) connection.release(); // Release the database connection
+    }
+});
 
 // Start Exam
 app.get('/start_exam', (req, res) => {
@@ -1003,9 +1045,9 @@ app.post('/get-questions', async (req, res) => {
 
         // Send the formatted questions array back to the frontend
         // Return the examId, questions, and end_time in the response
-        res.json({ 
-            examId, 
-            questions: questionsArray, 
+        res.json({
+            examId,
+            questions: questionsArray,
             end_time: results[0].end_time // Use the end_time from the first row
         });
     } catch (err) {
@@ -1121,11 +1163,12 @@ app.post('/get-my-questions', async (req, res) => {
 });
 
 app.get('/getExamIds', async (req, res) => {
-    const sql = "SELECT examID FROM exam_master";  // Fetch all examIDs from exam_master
+    const sql = "SELECT examID FROM exam_master where teacherId=?";  // Fetch all examIDs from exam_master
+    const userID = req.session.userID;
     const connection = await pool.getConnection();
 
     try {
-        const [exams] = await connection.query(sql);  // No need for req.session.myid here as we fetch all exams
+        const [exams] = await connection.query(sql, [userID]);  // No need for req.session.myid here as we fetch all exams
         res.json(exams);  // Send the list of examIDs as a response
     } catch (error) {
         console.error(error);

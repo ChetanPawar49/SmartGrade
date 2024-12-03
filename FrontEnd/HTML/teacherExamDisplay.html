@@ -5,7 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam List Form</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
     <link rel="stylesheet" href="/CSS/teacherExam.css">
+    <!-- <link rel="stylesheet" href="/CSS/teacherExamDisplay.css"> -->
 </head>
 
 <body>
@@ -329,7 +335,7 @@
 
                 // Check if this option is the correct answer
                 // if (i === question.correctOptionIndex) { // Assuming correctOptionIndex is provided
-                    // optionElement.selected = true; // Mark as selected if it's the correct answer
+                // optionElement.selected = true; // Mark as selected if it's the correct answer
                 // }
 
                 correctOptionSelect.appendChild(optionElement); // Append option to select
@@ -500,12 +506,25 @@
                     }
 
                     const exam = result[0]; // Access the first item directly
+                    const utcDate = new Date(exam.start_date);
+
+                    // Convert to IST (Indian Standard Time)
+                    const istDate = utcDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+                    // Extract only the date part
+                    const [day, month, year] = istDate.split(",")[0].split("/");
+
+                    // Format the date as YYYY-MM-DD
+                    const formattedDateForInput = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+                    console.log("Formatted Date for Input: ", formattedDateForInput);
 
                     // Populate modal with exam data directly from the response
                     document.getElementById('edit_name').value = exam.name || '';
                     console.log("Console Logging ::  " + exam.name);
                     console.log("Console Logging ::  " + exam.examID);
-                    document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
+                    // document.getElementById('edit_start_date').value = exam.start_date ? exam.start_date.split('T')[0] : '';
+                    document.getElementById('edit_start_date').value = formattedDateForInput;
                     document.getElementById('edit_start_time').value = exam.start_time || '';
                     document.getElementById('edit_end_time').value = exam.end_time || '';
                     // document.getElementById('edit_total_marks').value = exam.total_marks || '';

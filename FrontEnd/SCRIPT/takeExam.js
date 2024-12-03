@@ -46,7 +46,7 @@ async function fetchQuestions() {
         // Start the timer using the exam end time
         // startTimer(totalDuration, display, progressBar);
         console.log(data);
-        console.log("End Time: " ,data.end_time);
+        console.log("End Time: ", data.end_time);
         startTimer(data.end_time);
     } catch (error) {
         console.error('Error fetching questions:', error);
@@ -73,7 +73,7 @@ function startTimer(examEndTime) {
             progressBar.style.transform = "scaleX(0)";
             // Auto-submit the exam when time is up
             submitExam();
-        } else {    
+        } else {
             timeLeft--;
 
             // Calculate hours, minutes, and seconds
@@ -84,14 +84,42 @@ function startTimer(examEndTime) {
             // Format the display to include leading zeros
             timerDisplay.textContent = `${hoursLeft}:${totalMinutes < 10 ? '0' : ''}${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
 
+            // Calculate the remaining time percentage
+            const progressPercentage = timeLeft / duration;
+            progressBar.style.transform = `scaleX(${progressPercentage})`;
+
+            // Change the progress bar color based on the remaining time percentage
+            if (progressPercentage > 0.6) {
+                progressBar.style.backgroundColor = "green"; // More than 60% time left
+            } else if (progressPercentage > 0.3) {
+                progressBar.style.backgroundColor = "yellow"; // Between 30% and 60% time left
+            } else {
+                progressBar.style.backgroundColor = "red"; // Less than 30% time left
+            }
+
             // Update progress bar
             // const progressPercentage = ((duration - timeLeft) / duration) * 100;
             // progressBar.style.width = `${progressPercentage}%`;
 
-            const progressPercentage = timeLeft / duration; // Calculate the remaining time percentage
-            progressBar.style.transform = `scaleX(${progressPercentage})`;
+            // const progressPercentage = timeLeft / duration; // Calculate the remaining time percentage
+            // progressBar.style.transform = `scaleX(${progressPercentage})`;
         }
     }, 1000); // Update every second
+}
+
+// Function to submit the exam
+function submitExam() {
+    // Save the current answer before submission
+    saveAnswer();
+
+    console.log('Exam submitted successfully:');
+
+    // Alert the user and close the window
+    alert("Exam Submitted. Thank you!");
+
+    // Redirect or close the window after submission
+    window.close();  // Close the window
+    window.location.href = `/studentResult.html`;  // Redirect to result page if needed
 }
 
 function createProgressCircles() {
@@ -332,3 +360,20 @@ document.addEventListener('keydown', function (event) {
         alert("Developer tools are disabled.");
     }
 });
+
+// Access the user's webcam
+const video = document.getElementById('video');
+
+// Check if browser supports getUserMedia
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            // Set the video element's source to the webcam stream
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("Error accessing webcam: " + err);
+        });
+} else {
+    alert("Your browser does not support accessing the camera.");
+}

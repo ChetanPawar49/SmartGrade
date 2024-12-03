@@ -116,3 +116,15 @@ button:hover {
 .register-link a:hover {
     text-decoration: underline; 
 }
+
+/* eye icon */
+
+.eye-icon {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    margin-top: 5px;
+}

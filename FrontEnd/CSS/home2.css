@@ -63,27 +63,20 @@ img {
     margin-inline: 50px;
 }
         
+
 .card {
-    min-width: 70px;
-    /* height: 100%; */
-    height: 150px;
-    border-radius: 30px;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-    flex-grow: 1;
-    cursor: pointer;
     position: relative;
-    /* transition: flex-grow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-timing: 0.35s;  */
-    transition: transform 0.5s ease, opacity 0.5s ease, width 0.5s ease, height 0.5s ease;
-    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
        
 .card:hover {
-    /* flex-grow: 3; */
-    width: 750px;
-    height: 230px;
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
         
 .card > .background {

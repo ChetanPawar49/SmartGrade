@@ -27,12 +27,12 @@ body {
 
 .sidebar .logo-top img {
     max-width: 200px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 
 .sidebar h1 {
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .sidebar span {
