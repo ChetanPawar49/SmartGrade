@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
 
         // Validate email ends with @gmail.com
-        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        // const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!gmailRegex.test(email)) {
             // if (emailError) {
             //     emailError.textContent = 'Email must end with @gmail.com.';

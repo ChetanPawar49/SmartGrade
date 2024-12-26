@@ -13,11 +13,11 @@ CREATE TABLE `User_Master` (
   `userID` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `username` varchar(20) NOT NULL,
   `password` varchar(20) NOT NULL,
-  `firstname` varchar(10) NOT NULL,
-  `lastname` varchar(10),
+  `firstname` varchar(50) NOT NULL,
+  `lastname` varchar(50),
   `usertype` enum('Student', 'Teacher') NOT NULL,
   `mobile` varchar(15) NOT NULL,
-  `email` varchar(25) NOT NULL,
+  `email` varchar(200) NOT NULL,
   `status` enum('Pending', 'Active', 'Inactive') DEFAULT 'Pending',
   `timestamp` timestamp NOT NULL
 );
@@ -82,8 +82,7 @@ SHOW TABLES;
 
 INSERT INTO admin VALUES("admin", "admin123");
 
-INSERT INTO user_master VALUES(1, 'Chetan', 'chetan', 'chetan', 'pawar', 'Student', 8793164197, 'chetan.pawar492@gmail.com', 'Pending', CURRENT_TIMESTAMP);
-INSERT INTO user_master(username, password, firstname, lastname, usertype, mobile, email, timestamp) VALUES('shubham', 'ss', 'shubham', 'pawar', 'Student', 8237776199, 'shubham@gmail.com', current_timestamp());
+INSERT INTO user_master VALUES(1, 'Chetan', 'chetan', 'chetan', 'pawar', 'Student', 9854756321, 'chetan@gmail.com', 'Pending', CURRENT_TIMESTAMP);
 
 INSERT INTO `User_Master` (`username`, `password`, `firstname`, `lastname`, `usertype`, `mobile`, `email`, `status`, `timestamp`) VALUES
 ('rohand', 'pass123', 'Rohan', 'Deshmukh', 'Student', '9876543210', 'rohan.deshmukh@example.com', 'Active', CURRENT_TIMESTAMP),
