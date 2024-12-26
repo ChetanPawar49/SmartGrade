@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/setExam.css">
+    <title>Teacher's Exam Creation</title>
+</head>
+<body>
+    <div>
+        <input type="number" id="num-questions" placeholder="Enter number of questions">
+        <button id="generate-questions">Generate Questions</button>
+    </div>
+    
+    <div id="questions-form"></div>
+    
+    <div id="submit-container" class="hidden">
+        <button id="submit-questions">Submit Questions</button>
+    </div>
+    
+    <div id="alert-message" class="hidden"></div>
+    <div id="success-message" class="hidden"></div>
+    
+    <div id="created-questions"></div>
+    
+    <!-- Scheduling and Publishing Form -->
+    <div id="schedule-form" class="hidden">
+        <h3>Schedule Exam</h3>
+        <input type="text" id="exam-title" placeholder="Exam Title">
+        <input type="date" id="exam-date">
+        <input type="time" id="exam-time">
+        <button id="publish-exam">Publish Exam</button>
+    </div>
+    
+
+    <script src="/js/setExam.js"></script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam List Form</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
+    <!-- <link rel="stylesheet" href="/CSS/teacherExam.css"> -->
+    <style>
+        /* General form styling */
+        #examForm {
+            width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            /* background-color: #f9f9f9; */
+            background: linear-gradient(to right, #777bf1, #9884f4);
+            box-shadow: 0px 0px 20px 12px rgba(44, 92, 158, 0.36);
+            font-family: Arial, sans-serif;
+            margin-top: 35px;
+        }
+
+        #examForm h2 {
+            text-align: center;
+            /* color: #5746a1; */
+            color: #4e3aa8;
+            font-weight: bolder;
+        }
+
+        .examh h2 {
+            text-align: center;
+            /* color: #5746a1; */
+            color: #4e3aa8;
+            font-weight: bolder;
+            padding: 8px;
+            margin: 15px;
+            background-color: #9884f4;
+        }
+
+        /* Form labels and inputs */
+        #examForm label {
+            font-size: 16px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        #examForm input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Button container */
+        .button-container {
+            text-align: center;
+        }
+
+        .create-questions-btn {
+            /* background-color: #4CAF50; */
+            background-color: #4348cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .create-questions-btn:hover {
+            /* background-color: #45a049; */
+            background-color: #3016a7;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 500px) {
+            #examForm {
+                width: 90%;
+            }
+
+            #examForm input {
+                padding: 10px;
+            }
+
+            .create-questions-btn {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+
+        .exam-card {
+            background-color: #fff;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .exam-card h3 {
+            color: #5746a1;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .exam-details {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .exam-details div {
+            flex: 1 1 200px;
+            margin-bottom: 10px;
+        }
+
+        .exam-details div span {
+            font-weight: bold;
+            display: block;
+            color: #666;
+        }
+
+        .edit-btn {
+            /* background-color: #007bff; */
+            background: linear-gradient(to right, #9884f4, #585de4);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            margin-left: 45%;
+        }
+
+        .edit-btn:hover {
+            /* background-color: #0056b3; */
+            background: linear-gradient(to right, #5b4d96, #2c2f82);
+        }
+
+        /* Disabled button styles */
+        .edit-btn:disabled {
+            background: #d3d3d3 !important;
+            /* Use 'background' instead of 'background-color' */
+            cursor: not-allowed;
+            /* Change cursor to indicate disabled */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="examh">
+        <h2>All Exams</h2>
+    </div>
+
+    <div id="examForm">
+        <div id="examListContainer">
+            <!-- Data will be dynamically populated here -->
+        </div>
+        <!-- <div>
+            <button type="submit">Submit</button>
+        </div> -->
+    </div>
+
+    <script>
+        let examData = []; // Declare data variable in a higher scope
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchExams();
+
+            // Add a global event listener for the exam buttons
+            const examListContainer = document.getElementById('examListContainer');
+            examListContainer.addEventListener('click', (event) => {
+                // Check if the clicked element is a Take Exam button
+                if (event.target.classList.contains('edit-btn')) {
+                    const examID = event.target.getAttribute('data-exam-id');
+                    startTest(examID); // Call the function to start the test
+                }
+            });
+        });
+
+        // Function to fetch exams from the backend and populate the form
+        async function fetchExams() {
+            try {
+                const response = await fetch('/getStudentExams', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching exam data');
+                }
+
+                const data = await response.json();
+                // console.log(data);
+
+                if (data.success) {
+                    examData = data.exams; // Assign fetched data to the data variable
+                    const examListContainer = document.getElementById('examListContainer');
+                    data.exams.forEach(exam => {
+                        const examDiv = document.createElement('div');
+                        examDiv.classList.add('exam-entry');
+
+                        // console.log((new Date(exam.start_date)).toLocaleString());
+                        const dateObject = new Date(exam.start_date);
+                        const localTime = dateObject.toLocaleString();
+
+                        // Date and Time Format
+                        // const date = localTime.split('T')[0];
+                        const date = localTime.split(',')[0];
+                        // console.log(date);
+
+                        // console.log('Exam Start Date:', date);
+                        // console.log('Exam Start Time:', exam.start_time);
+
+                        let startTime = exam.start_time;
+                        let endTime = exam.end_time;
+
+                        let [hours1, minutes1] = startTime.split(':'); // Split the time string into hours and minutes
+                        let [hours2, minutes2] = endTime.split(':'); // Split the time string into hours and minutes
+
+                        hours1 = parseInt(hours1); // Convert the hours to an integer
+                        hours2 = parseInt(hours2); // Convert the hours to an integer
+
+                        const ampm1 = hours1 >= 12 ? 'PM' : 'AM';
+                        const ampm2 = hours2 >= 12 ? 'PM' : 'AM';
+
+                        hours1 = hours1 % 12 || 12; // Convert to 12-hour format
+                        hours2 = hours2 % 12 || 12; // Convert to 12-hour format
+
+                        examDiv.innerHTML = `
+                            <div class="exam-card">
+                                <h3 id="namee_${exam.examID}">Exam: ${exam.name}</h3>
+                                <div class="exam-details">
+                                    <div><span>Exam ID:</span> ${exam.examID}</div>
+                                    <div><span>Exam Name:</span> ${exam.name}</div>
+                                    <div><span>Exam Date:</span> ${date}</div>
+                                    <div><span>Exam Start Time:</span> ${hours1}:${minutes1} ${ampm1}</div>
+                                    <div><span>Exam End Time:</span> ${hours2}:${minutes2} ${ampm2}</div>
+                                    <div><span>Total Marks:</span> ${exam.total_marks}</div>
+                                    <div><span>Passing Marks:</span> ${exam.passing_marks}</div>
+                                </div>
+
+                                <button class="edit-btn" myevent="Take" id="takeTest_${exam.examID}" data-exam-id="${exam.examID}" disabled>Take Exam</button>
+                            </div>
+                        `;
+
+                        examListContainer.appendChild(examDiv);
+
+                        // Function to check if the "Take Test" button should be enabled
+                        // const examStart = new Date(`${exam.start_date}T${exam.start_time}`);
+                        // const examEnd = new Date(`${exam.start_date}T${exam.end_time}`);
+                        // const currentTime = new Date();
+
+                        // Create valid start and end date objects
+                        const examStart = new Date(`${date}T${startTime}:00`); // Add seconds
+                        const examEnd = new Date(`${date}T${endTime}:00`); // Add seconds
+                        const currentTime = new Date();
+
+                        // Check if the dates are valid
+                        // if (isNaN(examStart.getTime()) || isNaN(examEnd.getTime())) {
+                        // console.error('Invalid exam start or end time:', examStart, examEnd);
+                        // return; // Skip this exam if the dates are invalid
+                        // }
+
+                        // console.log(examStart);
+                        // console.log(examEnd);
+
+                        // if (currentTime >= examStart && currentTime <= examEnd) {
+                        // const TestBtn = document.getElementById(`takeTest_${exam.examID}`);
+                        // TestBtn.disabled = false;
+                        // }
+                    });
+
+                    // document.getElementById('editModal').style.display = "block";
+                    // document.getElementById('editModal').style.opacity = "1";  // Ensure modal is visible
+
+                } else {
+                    console.error('Failed to fetch exams:', data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching exam data.');
+            }
+        }
+
+        // Check the student's attempt status
+        async function checkExamStatus(examID) {
+            try {
+                const response = await fetch(`/checkExamStatus/${examID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.status === 'Completed') {
+                        // If exam is already completed, show alert and disable button
+                        console.log("Unsuccessful");
+                        alert('You can only take the exam once. Your exam has already been completed.');
+                        // const takeTestBtn = document.getElementById(`takeTest_${examID}`);
+                        // takeTestBtn.disabled = true;
+                    } else if (data.status === 'pending') {
+                        // window.top.location.href = `/start_exam?examID=${examID}`;
+
+                        // If exam is pending, allow the student to start the exam
+                        const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
+                        
+                        // Open the test in a new window in full-screen mode
+                        const newWindow = window.open(url, '_blank', 'fullscreen=yes');
+                    }
+                } else {
+                    console.error('Error checking exam status:', data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error checking exam status.');
+            }
+        }
+
+        // Function to handle starting the test
+        function startTest(examID) {
+            console.log("Hitting");
+            checkExamStatus(examID);
+            // Redirect to the test page or trigger the test-taking process
+            // window.top.location.href = `/start_exam?examID=${examID}`; // Redirect to the take test page, passing the exam ID
+
+            // const url = `/start_exam?examID=${examID}`;  // URL for the test page, passing the exam ID
+            // Open the test in a new window in full-screen mode
+            // const newWindow = window.open(url, '_blank', 'fullscreen=yes');
+        }
+
+        // Optionally, you can periodically check the time to enable/disable the button in real-time
+        setInterval(() => {
+            const currentTime = new Date();
+
+            examData.forEach(exam => {
+                // Use the full exam_start_date and combine with exam_start_time
+                const examStartDate = exam.start_date; // This already has the date and time in it
+                const examStartTime = exam.start_time; // This should be in HH:mm format
+
+                const examEndTime = exam.end_time; // Same for the end time
+
+                // Create a Date object
+                const dateObject = new Date(exam.start_date);
+                const localTime = dateObject.toLocaleString();
+                const date = localTime.split(',')[0];
+
+                // Split the date part into month, day, and year
+                const [day, month, year] = date.split('/'); // ["10", "14", "2024"]
+
+                // console.log(`Year: ${year}, Month: ${month}, Day: ${day}`);
+
+                // Extract year, month, and day
+                // const year = dateObject.getUTCFullYear();
+                // const month = String(dateObject.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                // const day = String(dateObject.getUTCDate()).padStart(2, '0');
+
+                // Format into YYYY-MM-DD
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // console.log(formattedDate); // Output: "2024-10-13"
+
+                // console.log(exam.start_date);
+                // console.log(exam.start_time);
+                // console.log(exam.end_time);
+
+                // Create Date objects in local time by combining date and time
+                // const examStart = new Date(examStartDate); // Start date already has time
+                // examStart.setHours(examStartTime.split(':')[0]); // Set hours
+                // examStart.setMinutes(examStartTime.split(':')[1]); // Set minutes
+
+                // const examEnd = new Date(examStartDate); // End date already has time
+                // examEnd.setHours(examEndTime.split(':')[0]); // Set hours
+                // examEnd.setMinutes(examEndTime.split(':')[1]); // Set minutes
+
+                // Check if the current time is within the exam time
+                const takeTestBtn = document.getElementById(`takeTest_${exam.examID}`);
+
+                // Function to check if the "Take Test" button should be enabled
+                const examStart = new Date(`${formattedDate}T${exam.start_time}`);
+                const examEnd = new Date(`${formattedDate}T${exam.end_time}`);
+                const currentTime = new Date();
+
+                // console.log("Current Time: ", currentTime);
+                // console.log("Start Time: ", examStart);
+                // console.log("End Time: ", examEnd);
+
+                // Enable or disable the test button based on the time comparison
+                if (currentTime >= examStart && currentTime <= examEnd) {
+                    takeTestBtn.disabled = false; // Enable the button if within the time range
+                    // takeTestBtn.addEventListener('click', () => {
+                    // console.log("In Action LIstener");
+                    // startTest(exam.examID); // Call the function to start the test
+                    // });
+                } else {
+                    takeTestBtn.disabled = true; // Disable otherwise
+                }
+            });
+        }, 1000); // Check every second
+    </script>
+</body>
+
+</html>

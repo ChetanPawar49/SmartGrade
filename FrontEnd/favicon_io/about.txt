@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: New Amsterdam
+- Font Author: Copyright 2024 The New Amsterdam Project Authors (https://github.com/vladimirnikolic1/NewAmsterdam)
+- Font Source: https://fonts.gstatic.com/s/newamsterdam/v1/YA9Vr02Y5lucHqUlbEe51kBtl7mGiv_Q7dA.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

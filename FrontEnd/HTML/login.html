@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/login.css">
+    <script src="/js/login.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Login Page</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
+</head>
+<body>
+    <div class="login-container">
+        <!-- <form onclick="sendreq(); return false" id="loginForm" class="login-form"> -->
+            <form id="loginForm" class="login-form" action="#">
+            <h2><i class="fas fa-user-circle"></i> Login</h2>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="Username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="Password" placeholder="Password" required>
+                <i class="fas fa-eye fa-eye-slash" id="togglePassword"></i> <!-- Eye icon for toggling password visibility -->
+            </div>
+            <!-- <div class="remember-me">
+                <input type="checkbox" id="remember">
+                <label for="remember">Remember Me</label>
+            </div> -->
+            <button type="submit">Login</button>
+        </form>
+        <!-- <p class="register-link">New user? <a href="/signup.html">Register</a></p> -->
+        <p class="register-link">New user? <a href="/home2.html">Register</a></p>
+    </div>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const passwordInput = document.querySelector('#Password');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle the eye icon class
+            // this.classList.toggle('fa-eye-slash');
+            // this.classList.toggle('fas fa-eye eye-icon');
+
+            // Toggle the eye icon class
+            if (this.classList.contains('fa-eye-slash')) {
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            } else {
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            }
+        });
+    </script>
+</body>
+</html>

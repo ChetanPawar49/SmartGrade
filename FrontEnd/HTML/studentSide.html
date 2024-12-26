@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP System - User Interface</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
+    <!-- <link rel="stylesheet" href="/FrontEnd/CSS/styles.css"> -->
+     <link rel="stylesheet" href="/css/studentInterface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-top">
+            <img src="/img/logo_transparent.png" alt="SmartGrade" class="logo">
+        </div>
+
+        <div class="nav-menu">
+            <a href="#" id="Dashboard">Dashboard</a>
+            <a href="#" id="Exam">Exam</a>
+            <a href="#" id="Result">Result</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+
+    </div>
+
+    <!-- Logout Section -->
+    <!-- <div id="logout-section" class="section">
+        <h2>Logout</h2>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div> -->
+
+    <div id="alert" class="alert">You have been logged out successfully.</div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('Dashboard').addEventListener('click', () => Screenchange('studentDash.html'));
+            document.getElementById('Exam').addEventListener('click', () => Screenchange('studentExamDisplay.html'));
+            document.getElementById('Result').addEventListener('click', () => Screenchange('getApplicantResult'));
+            // document.getElementById('Exam').addEventListener('click', () => Screenchange('upcomingExam.html'));
+            // document.getElementById('Setexam').addEventListener('click', () => Screenchange('setExam.html'));
+        });
+
+        function logout() {
+            if(confirm("Logging Out?")) {
+                document.getElementById('alert').classList.add('show');
+
+                // Send a fetch request to the server to handle logout
+                fetch('/logout', {
+                    method: 'POST', // Use POST method for logout
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin' // Ensure cookies are sent with the request
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Logout successful, redirect to home page
+                        setTimeout(() => {
+                            window.top.location.href = '/'; // Adjust this path to your home page
+                        }, 2000); // Adjust the timeout to match the duration of your message display
+                    } else {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Logout failed');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during logout:', error);
+                    // Optionally handle logout errors here
+                });
+            }
+        }
+
+        // Function to change the right frame's content
+        function Screenchange(content) {
+            // Alert to confirm function call (remove after debugging)
+            //alert("Changing frame content to: " + content);
+            // Change the right frame's source to the specified content
+            parent.frames['right'].location.href = content;
+        }
+    </script>
+</body>
+</html>

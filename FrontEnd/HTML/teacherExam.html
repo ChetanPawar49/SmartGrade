@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Exam</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
+    <!-- <link rel="stylesheet" href="/CSS/teacherExam2.css"> -->
+    <link rel="stylesheet" href="/CSS/teacherExam3.css">
+</head>
+<body>
+
+    <form id="examForm">
+        <h2>Create Exam</h2>
+        
+        <div>
+            <label for="examName">Exam Name:</label>
+            <input type="text" id="examName" name="examName" placeholder="Enter exam name" required>
+        </div>
+    
+        <div>
+            <label for="examDate">Exam Date:</label>
+            <input type="date" id="examDate" name="examDate" required>
+        </div>
+    
+        <div>
+            <label for="examTime">Exam Start Time:</label>
+            <input type="time" id="examStartTime" name="examTime" required>
+        </div>
+    
+        <div>
+            <label for="examEndTime">Exam End Time:</label>
+            <input type="time" id="examEndTime" name="exam_end_time" required>
+        </div>
+
+        <!-- <div>
+            <label for="examDuration">Exam Duration (Minutes):</label>
+            <input type="number" id="examDuration" name="examDuration" min="1" placeholder="Enter duration in minutes" required>
+        </div> -->
+    
+        <!-- <div>
+            <label for="totalMarks">Total Marks:</label>
+            <input type="number" id="totalMarks" name="totalMarks" placeholder="Enter total marks" required>
+        </div>
+    
+        <div>
+            <label for="passingMarks">Passing Marks:</label>
+            <input type="number" id="passingMarks" name="passingMarks" placeholder="Enter passing marks" required>
+        </div> -->
+    
+        <div class="button-container">
+            <button class="create-questions-btn" id="createQuestionsBtn">Create Questions</button>
+            <!-- <button class="set-exam-btn" id="setExamBtn">Set Exam</button> -->
+        </div>
+    </form>
+
+    <!-- <script src="/js/teacherExam2.js"></script> -->
+    <script>
+        // Event listener for "Create Questions" button (for the first row)
+        document.getElementById('createQuestionsBtn').addEventListener('click', function(event) {
+            createQuestions(this);
+            event.preventDefault();
+        });
+
+        // Function to handle question creation
+        async function createQuestions(button) {
+            <!-- const row = button.closest('tr'); -->
+            const examName = document.getElementById('examName').value;
+            const examDate = document.getElementById('examDate').value;
+            const examTime = document.getElementById('examStartTime').value;
+            const examEndTime = document.getElementById('examEndTime').value;
+            // const examDuration = document.getElementById('examDuration').value;
+            // const totalMarks = document.getElementById('totalMarks').value;
+            // const passingMarks = document.getElementById('passingMarks').value;
+
+            //const totalMarks = row.querySelector('input[type="number"]:nth-of-type(1)').value;
+            //const passingMarks = row.querySelector('input[type="number"]:last-of-type').value;
+            // const totalMarks = row.querySelector('input[type="number"]:last-of-type').value;
+            // const passingMarks = row.querySelector('input[type="number"]:last-of-type').value;
+
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examEndTime) {
+                alert("Please fill out all fields to set the exam.");
+                return;
+            }
+
+            /* if (parseInt(passingMarks) > parseInt(totalMarks)) {
+                alert('Passing Marks Cannot be Greater than Total Marks');
+                document.getElementById('passing_marks').value = '';
+                return;
+            } */
+
+            const myformData = {
+                examName: examName,
+                examDate: examDate,
+                examTime: examTime,
+                examEndTime: examEndTime,
+                // examDuration: examDuration,
+                // totalMarks: totalMarks,
+                // passingMarks: passingMarks
+            };
+
+            try {
+                console.log("Exam Creation");
+                const response = await fetch('/addExam', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(myformData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Registration successful!');
+                    // Redirect or clear the form as needed
+                    window.location.href = data.redirectURL;
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error submitting the form.');
+            }
+
+            alert('Exam created successfully!');
+            
+            // Save exam details in session storage
+            /* sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks); */
+
+            // Redirect to the question creation page (teacher_que.html)
+            // window.location.href = "/teacherQue.html";
+        }
+
+        // Function to set the exam (validate input)
+        function setExam(button) {
+            const row = button.closest('tr');
+            const examName = row.querySelector('input[type="text"]').value;
+            const examDate = row.querySelector('input[type="date"]').value;
+            const examTime = row.querySelector('input[type="time"]').value;
+            const examDuration = row.querySelector('input[type="number"]').value;
+            const totalMarks = row.querySelectorAll('input[type="number"]')[1].value;
+
+            // Validate input fields
+            if (!examName || !examDate || !examTime || !examDuration || !totalMarks) {
+                alert("Please fill out all fields to set the exam.");
+                return;
+            }
+
+            // Save exam details in session storage
+            sessionStorage.setItem('examName', examName);
+            sessionStorage.setItem('examDate', examDate);
+            sessionStorage.setItem('examTime', examTime);
+            sessionStorage.setItem('examDuration', examDuration);
+            sessionStorage.setItem('totalMarks', totalMarks);
+
+            // Message for user to confirm exam has been set
+            alert('Exam has been set successfully.');
+        }
+    </script>
+
+</body>
+</html>

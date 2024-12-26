@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/login.css">
+    <script src="/js/login.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Login Page</title>
+</head>
+<body>
+    <div>
+        <button id="home" class="home">Home</button>
+    </div>
+    <div class="login-container">
+        <!-- <form onclick="sendreq(); return false" id="loginForm" class="login-form"> -->
+            <form id="loginForm" class="login-form" action="#">
+            <h2><i class="fas fa-user-circle"></i> Login</h2>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="Username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="Password" placeholder="Password" required>
+            </div>
+            <!-- <div class="remember-me">
+                <input type="checkbox" id="remember">
+                <label for="remember">Remember Me</label>
+            </div> -->
+            <button type="submit">Login</button>
+        </form>
+        <!-- <p class="register-link">New user? <a href="/signup.html">Register</a></p> -->
+        <p class="register-link">New user? <a href="/teacherSignup.html">Register</a></p>
+    </div>
+
+</body>
+</html>

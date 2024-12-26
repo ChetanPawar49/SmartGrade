@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Dashboard</title>
+    <link rel="stylesheet" href="/css/examdashboard.css">
+</head>
+
+<body>
+    <div id="dashboard">
+        <h2>Exam Dashboard</h2>
+        <button id="create-exam-btn">Create New Exam</button>
+
+        <div id="exam-list">
+            <h3>Exams</h3>
+            <ul id="exams-ul">
+                <!-- Dynamically populated list of exams -->
+            </ul>
+        </div>
+    </div>
+
+    <div id="exam-creation-section" class="hidden">
+        <h2>Create Exam</h2>
+        <form id="exam-form">
+            <div class="form-group">
+                <label for="exam-name">Exam Name:</label>
+                <input type="text" id="exam-name" maxlength="15" required>
+            </div>
+            <div class="form-group">
+                <label for="num-questions">Number of Questions:</label>
+                <input type="number" id="num-questions" min="1" required>
+            </div>
+            <button type="button" id="generate-questions-btn">Generate Questions</button>
+            <div id="questions-form"></div>
+            <button type="submit" id="submit-exam-btn" class="hidden">Submit Exam</button>
+        </form>
+    </div>
+
+    <div id="exam-details-section" class="hidden">
+        <h2>Exam Details</h2>
+        <div id="exam-info">
+            <h3 id="exam-info-name"></h3>
+            <div id="exam-status-box">
+                <!-- Current status of the exam -->
+            </div>
+            <div id="status-management">
+                <label for="exam-status">Exam Status:</label>
+                <select id="exam-status">
+                    <option value="inactive">Inactive</option>
+                    <option value="active">Active</option>
+                    <option value="closed">Closed</option>
+                </select>
+                <button id="update-status-btn">Update Status</button>
+            </div>
+            <ul id="questions-ul">
+                <!-- Dynamically populated list of questions and answers -->
+            </ul>
+        </div>
+        <button id="schedule-exam-btn">Schedule Exam</button>
+    </div>
+
+    <div id="schedule-section" class="hidden">
+        <h2>Schedule Exam</h2>
+        <form id="schedule-form">
+            <div class="form-group">
+                <label for="schedule-date">Exam Date:</label>
+                <input type="date" id="schedule-date" required>
+            </div>
+            <div class="form-group">
+                <label for="schedule-time">Exam Time:</label>
+                <input type="time" id="schedule-time" required>
+            </div>
+            <button type="submit">Confirm Schedule</button>
+        </form>
+    </div>
+
+    <script src="/js/examdashboard.js"></script>
+</body>
+
+</html>

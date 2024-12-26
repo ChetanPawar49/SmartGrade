@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/fav/favicon.ico">
+    <link rel="manifest" href="/fav/site.webmanifest">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="#users" data-target="applicant-section">Students</a>
+        <a href="#organizers" data-target="organizer-section">Teachers</a>
+        <!-- <a href="#organizers" data-target="organizer-section">Organizers</a> -->
+        <!-- <a href="#organizations" data-target="organizations-section">Organizations</a> -->
+        <!-- <a href="#exams" data-target="exams-section">Exams</a> -->
+        <!-- <a href="#applications" data-target="applications-section">Applications</a> -->
+        <!-- <a href="#questions" data-target="questions-section">Questions</a>
+        <a href="#attempts" data-target="attempts-section">Attempts</a> -->
+        <!-- <a href="#transactions" data-target="transactions-section">Transactions</a> -->
+        <!-- <a href="#settings">Settings</a>
+        <a href="#reports">Reports</a> -->
+        <a href="#logout" data-target="logout-section">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>Dashboard</h1>
+            <p>Welcome to the admin panel. Here you can manage users, view reports, and configure settings.</p>
+            
+            <!-- Applicants Table -->
+            <div id="applicant-section" class="section">
+                <h2>Students</h2>
+                <table class="table table-striped" id="applicant-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Organizers Table -->
+            <div id="organizer-section" class="section">
+                <h2>Teachers</h2>
+                <table class="table table-striped" id="organizer-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Organizations Table -->
+            <!-- <div id="organizations-section" class="section">
+                <h2>Organizations</h2>
+                <table class="table table-striped" id="organizations-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody> -->
+                        <!-- Data will be populated here -->
+                    <!-- </tbody>
+                </table>
+            </div> -->
+            
+            <!-- Exams Table -->
+            <div id="exams-section" class="section">
+                <h2>Exams</h2>
+                <table class="table table-striped" id="exams-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Applications Table -->
+            <!-- <div id="applications-section" class="section">
+                <h2>Applications</h2>
+                <table class="table table-striped" id="applications-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Exam ID</th>
+                            <th>Aadhaar Card</th>
+                            <th>Fees Status</th>
+                        </tr>
+                    </thead>
+                    <tbody> -->
+                        <!-- Data will be populated here -->
+                    <!-- </tbody>
+                </table>
+            </div> -->
+            
+            <!-- Questions Table -->
+            <div id="questions-section" class="section">
+                <h2>Questions</h2>
+                <table class="table table-striped" id="questions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Exam ID</th>
+                            <th>Question</th>
+                            <th>Option A</th>
+                            <th>Option B</th>
+                            <th>Option C</th>
+                            <th>Option D</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Attempts Table -->
+            <div id="attempts-section" class="section">
+                <h2>Attempts</h2>
+                <table class="table table-striped" id="attempts-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Exam ID</th>
+                            <th>Question ID</th>
+                            <th>Application ID</th>
+                            <th>Selected Option</th>
+                            <th>Correct Option</th>
+                            <th>Marks Obtained</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Transactions Table -->
+            <!-- <div id="transactions-section" class="section">
+                <h2>Transactions</h2>
+                <table class="table table-striped" id="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Exam ID</th>
+                            <th>Paid Fees</th>
+                            <th>UPI Token</th>
+                        </tr>
+                    </thead>
+                    <tbody> -->
+                        <!-- Data will be populated here -->
+                    <!-- </tbody>
+                </table>
+            </div> -->
+
+            <!-- Logout Section -->
+            <div id="logout-section" class="section">
+                <h2>Logout</h2>
+                <button class="btn btn-danger" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- JavaScript to Fetch and Display Data -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show the initial section
+            document.querySelector('#applicant-section')?.classList.add('active');
+
+            // Handle sidebar link clicks
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default link behavior
+
+                    // Remove 'active' class from all sections
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+
+                    // Add 'active' class to the clicked section
+                    const targetId = this.getAttribute('data-target');
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    } else {
+                        console.error(`Section with id ${targetId} not found.`);
+                    }
+                });
+            });
+            function fetchData(endpoint, tableId) {
+        fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            if (tableBody) {
+                tableBody.innerHTML = ''; // Clear any existing rows
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id || ''}</td>
+                        <td>${item.name || ''}</td>
+                        <td>${item.email || ''}</td>
+                        <td>${item.usertype || ''}</td>
+                        <td>
+                            <select class="form-control status-select" data-id="${item.id}">
+                                <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
+                            </select>
+                        </td>
+                        <td><button class="btn btn-primary update-status-btn" data-id="${item.id}">Update Status</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Reattach click event listeners to buttons
+                document.querySelectorAll('.update-status-btn').forEach(button => {
+                    // Clone the button to remove existing event listeners
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+
+                    newButton.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const select = document.querySelector(`.status-select[data-id="${id}"]`);
+                        const status = select ? select.value : '';
+
+                        if (status) {
+                            updateStatus(id, status);
+                        } else {
+                            console.error('Status is undefined or empty');
+                        }
+                    });
+                });
+            } else {
+                console.error(`Table with id ${tableId} not found.`);
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to post data to the /status API
+    function updateStatus(id, status) {
+        console.log('updateStatus triggered');
+        fetch('/status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(`Status updated and email sent successfully! User is now ${status}.`);
+            console.log('Response from server:', data);
+
+            // Reload the data after updating the status to reflect the most recent status
+            fetchData('/student', 'applicant-table');
+            fetchData('/teacher', 'organizer-table');
+            fetchData('/exam', 'exams-table');
+            fetchData('/question', 'questions-table');
+            fetchData('/attempt', 'attempts-table');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating status.');
+        });
+    }
+
+    // Initial Fetch and populate data for each table
+    fetchData('/student', 'applicant-table');
+    fetchData('/teacher', 'organizer-table');
+    // fetchData('/exam', 'exams-table');
+    // fetchData('/question', 'questions-table');
+    // fetchData('/attempt', 'attempts-table');
+});
+        // Logout function
+        function logout() {
+            // Perform logout action here
+            // For example: window.location.href = '/logout';
+            if(confirm("Logging Out?")) {
+                window.top.location.href = '/';
+                alert('Logged out successfully!');
+            }
+        }
+    </script>
+</body>
+
+</html>
